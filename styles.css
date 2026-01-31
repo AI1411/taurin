@@ -158,7 +158,12 @@ body {
   }
 }
 
-.tab-content {
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
   animation: fadeIn var(--duration-normal) var(--ease-ios);
 }
 

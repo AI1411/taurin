@@ -44,11 +44,11 @@ pub fn app() -> Html {
                 </button>
             </div>
 
-            <div class="tab-content">
-                {match *active_tab {
-                    Tab::ImageCompressor => html! { <ImageCompressor /> },
-                    Tab::CsvViewer => html! { <CsvViewer /> },
-                }}
+            <div class={if *active_tab == Tab::ImageCompressor { "tab-panel active" } else { "tab-panel" }}>
+                <ImageCompressor />
+            </div>
+            <div class={if *active_tab == Tab::CsvViewer { "tab-panel active" } else { "tab-panel" }}>
+                <CsvViewer />
             </div>
         </main>
     }

@@ -19,14 +19,8 @@ pub fn app() -> Html {
         })
     };
 
-    let container_class = if *active_tab == Tab::CsvViewer {
-        "container container-wide"
-    } else {
-        "container"
-    };
-
     html! {
-        <main class={container_class}>
+        <main class="container container-wide">
             <div class="tab-navigation">
                 <button
                     class={if *active_tab == Tab::ImageCompressor { "tab-btn active" } else { "tab-btn" }}

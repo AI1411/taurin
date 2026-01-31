@@ -70,8 +70,16 @@ enum SortOrder {
     Desc,
 }
 
+#[derive(Properties, PartialEq)]
+pub struct CsvViewerProps {
+    #[prop_or_default]
+    pub dropped_file: Option<String>,
+    #[prop_or_default]
+    pub on_file_processed: Callback<()>,
+}
+
 #[function_component(CsvViewer)]
-pub fn csv_viewer() -> Html {
+pub fn csv_viewer(props: &CsvViewerProps) -> Html {
     let file_path = use_state(|| String::new());
     let csv_data = use_state(|| Option::<CsvData>::None);
     let csv_info = use_state(|| Option::<CsvInfo>::None);
@@ -84,6 +92,66 @@ pub fn csv_viewer() -> Html {
     let column_filters = use_state(|| Vec::<String>::new());
     let is_loading = use_state(|| false);
     let is_fullscreen = use_state(|| false);
+
+    // Handle dropped file
+    {
+        let dropped_file = props.dropped_file.clone();
+        let on_file_processed = props.on_file_processed.clone();
+        let file_path = file_path.clone();
+        let csv_data = csv_data.clone();
+        let csv_info = csv_info.clone();
+        let edited_rows = edited_rows.clone();
+        let is_modified = is_modified.clone();
+        let column_filters = column_filters.clone();
+        let sort_column = sort_column.clone();
+        let sort_order = sort_order.clone();
+        let is_loading = is_loading.clone();
+
+        use_effect_with(dropped_file.clone(), move |dropped_file| {
+            if let Some(path) = dropped_file.clone() {
+                let file_path = file_path.clone();
+                let csv_data = csv_data.clone();
+                let csv_info = csv_info.clone();
+                let edited_rows = edited_rows.clone();
+                let is_modified = is_modified.clone();
+                let column_filters = column_filters.clone();
+                let sort_column = sort_column.clone();
+                let sort_order = sort_order.clone();
+                let is_loading = is_loading.clone();
+                let on_file_processed = on_file_processed.clone();
+
+                spawn_local(async move {
+                    file_path.set(path.clone());
+                    is_loading.set(true);
+
+                    let args =
+                        serde_wasm_bindgen::to_value(&ReadCsvArgs { path: path.clone() }).unwrap();
+                    let data_result = invoke("read_csv_cmd", args).await;
+
+                    if let Ok(data) = serde_wasm_bindgen::from_value::<CsvData>(data_result) {
+                        let filters = vec![String::new(); data.headers.len()];
+                        column_filters.set(filters);
+                        edited_rows.set(data.rows.clone());
+                        csv_info.set(Some(CsvInfo {
+                            file_name: path.split('/').last().unwrap_or("unknown").to_string(),
+                            file_size: 0,
+                            row_count: data.total_rows,
+                            column_count: data.total_columns,
+                            headers: data.headers.clone(),
+                        }));
+                        csv_data.set(Some(data));
+                        is_modified.set(false);
+                        sort_column.set(None);
+                        sort_order.set(SortOrder::None);
+                    }
+
+                    is_loading.set(false);
+                    on_file_processed.emit(());
+                });
+            }
+            || {}
+        });
+    }
 
     let on_select_file = {
         let file_path = file_path.clone();
@@ -358,7 +426,7 @@ pub fn csv_viewer() -> Html {
             <div class="section" onclick={on_select_file.clone()}>
                 <div class="drop-zone">
                     <div class="drop-zone-icon">{"📊"}</div>
-                    <p class="drop-zone-text">{"Click to select a CSV file"}</p>
+                    <p class="drop-zone-text">{"Click or drag & drop a CSV file"}</p>
                     <p class="drop-zone-hint">{"CSV, TSV, TXT"}</p>
                 </div>
                 {if !file_path.is_empty() {

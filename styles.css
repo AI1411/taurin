@@ -93,6 +93,47 @@ body {
   max-width: 100%;
 }
 
+.container.drag-over {
+  position: relative;
+}
+
+/* ===== Drop Overlay ===== */
+.drop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 122, 255, 0.15);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--duration-fast) var(--ease-ios);
+}
+
+.drop-overlay-content {
+  background: var(--color-bg-secondary);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 2px dashed var(--color-tint-blue);
+}
+
+.drop-overlay-icon {
+  font-size: 64px;
+  margin-bottom: var(--spacing-md);
+}
+
+.drop-overlay-content p {
+  font-size: var(--text-title2);
+  font-weight: 600;
+  color: var(--color-tint-blue);
+  margin: 0;
+}
+
 .container > h1 {
   font-size: var(--text-large-title);
   font-weight: 700;

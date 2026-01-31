@@ -89,6 +89,10 @@ body {
   padding: var(--spacing-lg) var(--spacing-md);
 }
 
+.container.container-wide {
+  max-width: 100%;
+}
+
 .container > h1 {
   font-size: var(--text-large-title);
   font-weight: 700;

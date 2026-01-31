@@ -83,6 +83,7 @@ pub fn csv_viewer() -> Html {
     let is_modified = use_state(|| false);
     let column_filters = use_state(|| Vec::<String>::new());
     let is_loading = use_state(|| false);
+    let is_fullscreen = use_state(|| false);
 
     let on_select_file = {
         let file_path = file_path.clone();
@@ -290,6 +291,13 @@ pub fn csv_viewer() -> Html {
         })
     };
 
+    let on_toggle_fullscreen = {
+        let is_fullscreen = is_fullscreen.clone();
+        Callback::from(move |_| {
+            is_fullscreen.set(!*is_fullscreen);
+        })
+    };
+
     let filtered_and_sorted_rows = {
         let rows = (*edited_rows).clone();
         let query = (*search_query).clone().to_lowercase();
@@ -429,8 +437,19 @@ pub fn csv_viewer() -> Html {
 
             // CSV Table
             {if let Some(data) = &*csv_data {
+                let table_container_class = if *is_fullscreen {
+                    "section csv-table-container fullscreen"
+                } else {
+                    "section csv-table-container"
+                };
+                let on_toggle = on_toggle_fullscreen.clone();
                 html! {
-                    <div class="section csv-table-container">
+                    <div class={table_container_class}>
+                        <div class="table-header">
+                            <button onclick={on_toggle} class="fullscreen-btn" title={if *is_fullscreen { "Exit fullscreen" } else { "Fullscreen" }}>
+                                {if *is_fullscreen { "✕" } else { "⛶" }}
+                            </button>
+                        </div>
                         <div class="csv-table-wrapper">
                             <table class="csv-table">
                                 <thead>

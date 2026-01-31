@@ -707,6 +707,56 @@ body {
 .csv-table-container {
   padding: 0;
   overflow: hidden;
+  position: relative;
+}
+
+.csv-table-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  border-radius: 0;
+  background: var(--color-bg-secondary);
+  display: flex;
+  flex-direction: column;
+}
+
+.csv-table-container.fullscreen .csv-table-wrapper {
+  max-height: none;
+  flex: 1;
+}
+
+.table-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-separator);
+  background: var(--color-bg-secondary);
+}
+
+.fullscreen-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-fill-tertiary);
+  color: var(--color-label-primary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-ios);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullscreen-btn:hover {
+  background: var(--color-fill-secondary);
+}
+
+.fullscreen-btn:active {
+  transform: scale(0.95);
 }
 
 .csv-table-wrapper {

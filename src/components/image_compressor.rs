@@ -284,6 +284,21 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
 
     html! {
         <div class="image-compressor">
+            // Loading Overlay
+            {if *is_processing {
+                html! {
+                    <div class="processing-overlay">
+                        <div class="processing-content">
+                            <div class="processing-spinner"></div>
+                            <p class="processing-title">{"Compressing..."}</p>
+                            <p class="processing-hint">{"Please wait while your image is being compressed"}</p>
+                        </div>
+                    </div>
+                }
+            } else {
+                html! {}
+            }}
+
             // File Selection
             <div class="section" onclick={on_select_file.clone()}>
                 <div class="drop-zone">

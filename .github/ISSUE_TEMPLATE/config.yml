@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: ディスカッション
+    url: https://github.com/ishiiakira/taurin/discussions
+    about: 一般的な質問やアイデアの共有はこちら

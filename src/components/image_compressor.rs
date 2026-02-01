@@ -78,8 +78,16 @@ fn format_size(bytes: u64) -> String {
     }
 }
 
+#[derive(Properties, PartialEq)]
+pub struct ImageCompressorProps {
+    #[prop_or_default]
+    pub dropped_file: Option<String>,
+    #[prop_or_default]
+    pub on_file_processed: Callback<()>,
+}
+
 #[function_component(ImageCompressor)]
-pub fn image_compressor() -> Html {
+pub fn image_compressor(props: &ImageCompressorProps) -> Html {
     let input_path = use_state(|| String::new());
     let image_info = use_state(|| Option::<ImageInfo>::None);
     let quality = use_state(|| 80u8);
@@ -88,6 +96,39 @@ pub fn image_compressor() -> Html {
     let custom_height = use_state(|| Option::<u32>::None);
     let compression_result = use_state(|| Option::<CompressionResult>::None);
     let is_processing = use_state(|| false);
+
+    // Handle dropped file
+    {
+        let dropped_file = props.dropped_file.clone();
+        let on_file_processed = props.on_file_processed.clone();
+        let input_path = input_path.clone();
+        let image_info = image_info.clone();
+        let compression_result = compression_result.clone();
+
+        use_effect_with(dropped_file.clone(), move |dropped_file| {
+            if let Some(path) = dropped_file.clone() {
+                let input_path = input_path.clone();
+                let image_info = image_info.clone();
+                let compression_result = compression_result.clone();
+                let on_file_processed = on_file_processed.clone();
+
+                spawn_local(async move {
+                    input_path.set(path.clone());
+                    compression_result.set(None);
+
+                    let args = serde_wasm_bindgen::to_value(&GetImageInfoArgs { path }).unwrap();
+                    let info_result = invoke("get_image_info_cmd", args).await;
+
+                    if let Ok(info) = serde_wasm_bindgen::from_value::<ImageInfo>(info_result) {
+                        image_info.set(Some(info));
+                    }
+
+                    on_file_processed.emit(());
+                });
+            }
+            || {}
+        });
+    }
 
     let on_select_file = {
         let input_path = input_path.clone();
@@ -243,11 +284,26 @@ pub fn image_compressor() -> Html {
 
     html! {
         <div class="image-compressor">
+            // Loading Overlay
+            {if *is_processing {
+                html! {
+                    <div class="processing-overlay">
+                        <div class="processing-content">
+                            <div class="processing-spinner"></div>
+                            <p class="processing-title">{"Compressing..."}</p>
+                            <p class="processing-hint">{"Please wait while your image is being compressed"}</p>
+                        </div>
+                    </div>
+                }
+            } else {
+                html! {}
+            }}
+
             // File Selection
             <div class="section" onclick={on_select_file.clone()}>
                 <div class="drop-zone">
                     <div class="drop-zone-icon">{"🖼️"}</div>
-                    <p class="drop-zone-text">{"Click to select an image"}</p>
+                    <p class="drop-zone-text">{"Click or drag & drop an image"}</p>
                     <p class="drop-zone-hint">{"PNG, JPEG, WebP, AVIF, GIF, BMP"}</p>
                 </div>
                 {if !input_path.is_empty() {

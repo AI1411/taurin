@@ -1,9 +1,14 @@
 mod csv_viewer;
 mod image_compressor;
+mod pdf_tools;
 
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
 use image_compressor::{
     compress_image, get_image_info, CompressionOptions, CompressionResult, ImageInfo,
+};
+use pdf_tools::{
+    get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
+    PdfSplitResult,
 };
 
 #[tauri::command]
@@ -49,6 +54,31 @@ fn save_csv_cmd(path: String, headers: Vec<String>, rows: Vec<Vec<String>>) -> R
     save_csv(&path, &headers, &rows)
 }
 
+#[tauri::command]
+fn get_pdf_info_cmd(path: String) -> Result<PdfInfo, String> {
+    get_pdf_info(&path)
+}
+
+#[tauri::command]
+fn split_pdf_by_pages_cmd(input_path: String, output_dir: String) -> PdfSplitResult {
+    split_pdf_by_pages(&input_path, &output_dir)
+}
+
+#[tauri::command]
+fn split_pdf_by_range_cmd(
+    input_path: String,
+    output_path: String,
+    start_page: u32,
+    end_page: u32,
+) -> PdfSplitResult {
+    split_pdf_by_range(&input_path, &output_path, start_page, end_page)
+}
+
+#[tauri::command]
+fn merge_pdfs_cmd(input_paths: Vec<String>, output_path: String) -> PdfMergeResult {
+    merge_pdfs(&input_paths, &output_path)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -71,7 +101,11 @@ pub fn run() {
             get_image_info_cmd,
             read_csv_cmd,
             get_csv_info_cmd,
-            save_csv_cmd
+            save_csv_cmd,
+            get_pdf_info_cmd,
+            split_pdf_by_pages_cmd,
+            split_pdf_by_range_cmd,
+            merge_pdfs_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

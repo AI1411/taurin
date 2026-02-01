@@ -1013,6 +1013,242 @@ body {
   color: var(--color-label-secondary);
 }
 
+/* ===== PDF Tools ===== */
+.pdf-tools {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.pdf-tools h2 {
+  display: none;
+}
+
+/* Mode Toggle */
+.mode-toggle {
+  display: flex;
+  gap: var(--spacing-sm);
+  background: var(--color-bg-primary);
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+}
+
+.mode-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-label-secondary);
+  font-size: var(--text-subhead);
+  font-weight: 500;
+  font-family: var(--font-system);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-ios);
+}
+
+.mode-btn:hover {
+  color: var(--color-label-primary);
+  background: var(--color-fill-tertiary);
+}
+
+.mode-btn.active {
+  background: var(--color-tint-blue);
+  color: #ffffff;
+}
+
+/* Split Options */
+.split-options {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Page Range Inputs */
+.page-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.page-range-inputs input {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body);
+  font-family: var(--font-system);
+  background: var(--color-bg-primary);
+  color: var(--color-label-primary);
+  transition: box-shadow var(--duration-fast) var(--ease-ios);
+  text-align: center;
+}
+
+.page-range-inputs input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
+.page-range-inputs span {
+  color: var(--color-label-tertiary);
+  font-weight: 500;
+}
+
+/* Merge File List */
+.merge-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.merge-file-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  transition: background var(--duration-fast) var(--ease-ios);
+}
+
+.merge-file-item:hover {
+  background: var(--color-fill-tertiary);
+}
+
+.merge-file-order {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.order-btn {
+  width: 24px;
+  height: 20px;
+  border: none;
+  border-radius: 4px;
+  background: var(--color-fill-secondary);
+  color: var(--color-label-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-ios);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-btn:hover:not(:disabled) {
+  background: var(--color-tint-blue);
+  color: #ffffff;
+}
+
+.order-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.merge-file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.merge-file-name {
+  font-size: var(--text-subhead);
+  font-weight: 500;
+  color: var(--color-label-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.merge-file-pages {
+  font-size: var(--text-footnote);
+  color: var(--color-label-secondary);
+}
+
+.remove-file-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-label-tertiary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-ios);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-file-btn:hover {
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--color-tint-red);
+}
+
+.merge-total {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-fill-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-subhead);
+  font-weight: 500;
+  color: var(--color-label-secondary);
+  text-align: center;
+}
+
+/* File name value in info grid */
+.file-name-value {
+  font-size: var(--text-footnote);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* PDF Action Buttons */
+.pdf-action-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.pdf-action-buttons .compress-btn {
+  flex: 1;
+}
+
+/* Secondary Button */
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  background: var(--color-fill-tertiary);
+  color: var(--color-label-primary);
+  border: none;
+  padding: 14px var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body);
+  font-weight: 600;
+  font-family: var(--font-system);
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease-ios),
+              transform 0.1s var(--ease-ios);
+  min-height: 50px;
+}
+
+.secondary-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.secondary-btn:active:not(:disabled) {
+  transform: scale(0.98);
+  opacity: 0.7;
+}
+
+.reset-btn {
+  min-width: 80px;
+}
+
 /* ===== Dark Mode ===== */
 @media (prefers-color-scheme: dark) {
   :root {

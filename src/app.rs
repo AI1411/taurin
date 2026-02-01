@@ -1,5 +1,6 @@
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
+use crate::components::pdf_tools::PdfTools;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -14,6 +15,7 @@ extern "C" {
 enum Tab {
     ImageCompressor,
     CsvViewer,
+    PdfTools,
 }
 
 fn get_file_extension(path: &str) -> Option<String> {
@@ -40,21 +42,28 @@ fn is_csv_file(path: &str) -> bool {
     )
 }
 
+fn is_pdf_file(path: &str) -> bool {
+    matches!(get_file_extension(path).as_deref(), Some("pdf"))
+}
+
 #[function_component(App)]
 pub fn app() -> Html {
     let active_tab = use_state(|| Tab::ImageCompressor);
     let dropped_image_path = use_state(|| Option::<String>::None);
     let dropped_csv_path = use_state(|| Option::<String>::None);
+    let dropped_pdf_path = use_state(|| Option::<String>::None);
     // Set up drag-drop event listeners (only once on mount)
     {
         let active_tab = active_tab.clone();
         let dropped_image_path = dropped_image_path.clone();
         let dropped_csv_path = dropped_csv_path.clone();
+        let dropped_pdf_path = dropped_pdf_path.clone();
 
         use_effect_with((), move |_| {
             let active_tab = active_tab.clone();
             let dropped_image_path = dropped_image_path.clone();
             let dropped_csv_path = dropped_csv_path.clone();
+            let dropped_pdf_path = dropped_pdf_path.clone();
 
             spawn_local(async move {
                 // Listen for file drop only
@@ -62,6 +71,7 @@ pub fn app() -> Html {
                     let active_tab = active_tab.clone();
                     let dropped_image_path = dropped_image_path.clone();
                     let dropped_csv_path = dropped_csv_path.clone();
+                    let dropped_pdf_path = dropped_pdf_path.clone();
                     Closure::new(move |event: JsValue| {
                         if let Ok(paths) = serde_wasm_bindgen::from_value::<DropEvent>(event) {
                             if let Some(first_path) = paths.payload.first() {
@@ -71,6 +81,9 @@ pub fn app() -> Html {
                                 } else if is_csv_file(first_path) {
                                     dropped_csv_path.set(Some(first_path.clone()));
                                     active_tab.set(Tab::CsvViewer);
+                                } else if is_pdf_file(first_path) {
+                                    dropped_pdf_path.set(Some(first_path.clone()));
+                                    active_tab.set(Tab::PdfTools);
                                 }
                             }
                         }
@@ -105,6 +118,13 @@ pub fn app() -> Html {
         })
     };
 
+    let on_pdf_file_processed = {
+        let dropped_pdf_path = dropped_pdf_path.clone();
+        Callback::from(move |_| {
+            dropped_pdf_path.set(None);
+        })
+    };
+
     html! {
         <main class="container container-wide">
             <div class="tab-navigation">
@@ -128,6 +148,16 @@ pub fn app() -> Html {
                     <span class="tab-icon">{"📊"}</span>
                     <span class="tab-label">{"CSV Viewer"}</span>
                 </button>
+                <button
+                    class={if *active_tab == Tab::PdfTools { "tab-btn active" } else { "tab-btn" }}
+                    onclick={
+                        let on_click = on_tab_click.clone();
+                        Callback::from(move |_| on_click.emit(Tab::PdfTools))
+                    }
+                >
+                    <span class="tab-icon">{"📄"}</span>
+                    <span class="tab-label">{"PDF Tools"}</span>
+                </button>
             </div>
 
             <div class={if *active_tab == Tab::ImageCompressor { "tab-panel active" } else { "tab-panel" }}>
@@ -140,6 +170,12 @@ pub fn app() -> Html {
                 <CsvViewer
                     dropped_file={(*dropped_csv_path).clone()}
                     on_file_processed={on_csv_file_processed}
+                />
+            </div>
+            <div class={if *active_tab == Tab::PdfTools { "tab-panel active" } else { "tab-panel" }}>
+                <PdfTools
+                    dropped_file={(*dropped_pdf_path).clone()}
+                    on_file_processed={on_pdf_file_processed}
                 />
             </div>
         </main>

@@ -45,24 +45,19 @@ pub fn app() -> Html {
     let active_tab = use_state(|| Tab::ImageCompressor);
     let dropped_image_path = use_state(|| Option::<String>::None);
     let dropped_csv_path = use_state(|| Option::<String>::None);
-    let is_drag_over = use_state(|| false);
-
-    // Set up drag-drop event listeners
+    // Set up drag-drop event listeners (only once on mount)
     {
         let active_tab = active_tab.clone();
         let dropped_image_path = dropped_image_path.clone();
         let dropped_csv_path = dropped_csv_path.clone();
-        let is_drag_over = is_drag_over.clone();
 
         use_effect_with((), move |_| {
             let active_tab = active_tab.clone();
             let dropped_image_path = dropped_image_path.clone();
             let dropped_csv_path = dropped_csv_path.clone();
-            let is_drag_over_enter = is_drag_over.clone();
-            let is_drag_over_leave = is_drag_over.clone();
 
             spawn_local(async move {
-                // Listen for file drop
+                // Listen for file drop only
                 let drop_handler = {
                     let active_tab = active_tab.clone();
                     let dropped_image_path = dropped_image_path.clone();
@@ -83,26 +78,6 @@ pub fn app() -> Html {
                 };
                 let _ = tauri_listen("file-drop", &drop_handler).await;
                 drop_handler.forget();
-
-                // Listen for drag enter
-                let enter_handler = {
-                    let is_drag_over = is_drag_over_enter.clone();
-                    Closure::new(move |_: JsValue| {
-                        is_drag_over.set(true);
-                    })
-                };
-                let _ = tauri_listen("file-drag-enter", &enter_handler).await;
-                enter_handler.forget();
-
-                // Listen for drag leave
-                let leave_handler = {
-                    let is_drag_over = is_drag_over_leave.clone();
-                    Closure::new(move |_: JsValue| {
-                        is_drag_over.set(false);
-                    })
-                };
-                let _ = tauri_listen("file-drag-leave", &leave_handler).await;
-                leave_handler.forget();
             });
 
             || {}
@@ -130,27 +105,8 @@ pub fn app() -> Html {
         })
     };
 
-    let container_class = if *is_drag_over {
-        "container container-wide drag-over"
-    } else {
-        "container container-wide"
-    };
-
     html! {
-        <main class={container_class}>
-            {if *is_drag_over {
-                html! {
-                    <div class="drop-overlay">
-                        <div class="drop-overlay-content">
-                            <div class="drop-overlay-icon">{"📁"}</div>
-                            <p>{"Drop file here"}</p>
-                        </div>
-                    </div>
-                }
-            } else {
-                html! {}
-            }}
-
+        <main class="container container-wide">
             <div class="tab-navigation">
                 <button
                     class={if *active_tab == Tab::ImageCompressor { "tab-btn active" } else { "tab-btn" }}

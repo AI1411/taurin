@@ -56,21 +56,14 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .on_window_event(|window, event| match event {
-            WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. }) => {
+        .on_window_event(|window, event| {
+            if let WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. }) = event {
                 let paths_str: Vec<String> = paths
                     .iter()
                     .filter_map(|p| p.to_str().map(|s| s.to_string()))
                     .collect();
                 let _ = window.emit("file-drop", paths_str);
             }
-            WindowEvent::DragDrop(tauri::DragDropEvent::Enter { .. }) => {
-                let _ = window.emit("file-drag-enter", ());
-            }
-            WindowEvent::DragDrop(tauri::DragDropEvent::Leave) => {
-                let _ = window.emit("file-drag-leave", ());
-            }
-            _ => {}
         })
         .invoke_handler(tauri::generate_handler![
             greet,

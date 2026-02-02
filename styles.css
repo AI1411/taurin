@@ -1300,6 +1300,11 @@ body {
   background: rgba(0, 122, 255, 0.04);
 }
 
+.kanban-column.drag-over {
+  background: rgba(0, 122, 255, 0.12);
+  border: 2px dashed var(--color-tint-blue);
+}
+
 .kanban-column-header {
   display: flex;
   align-items: center;
@@ -1357,6 +1362,7 @@ body {
 .kanban-card.dragging {
   opacity: 0.5;
   transform: rotate(3deg);
+  pointer-events: none;
 }
 
 .card-header {

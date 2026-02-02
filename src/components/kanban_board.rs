@@ -131,6 +131,7 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
     let editing_task = use_state(|| Option::<Task>::None);
     let search_query = use_state(String::new);
     let dragging_task_id = use_state(|| Option::<String>::None);
+    let hover_column = use_state(|| Option::<TaskColumn>::None);
 
     // Form states
     let new_title = use_state(String::new);
@@ -290,34 +291,6 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
         })
     };
 
-    let on_drag_start = {
-        let dragging_task_id = dragging_task_id.clone();
-        Callback::from(move |task_id: String| {
-            dragging_task_id.set(Some(task_id));
-        })
-    };
-
-    let on_drag_end = {
-        let dragging_task_id = dragging_task_id.clone();
-        Callback::from(move |_| {
-            dragging_task_id.set(None);
-        })
-    };
-
-    let on_drop = {
-        let dragging_task_id = dragging_task_id.clone();
-        let on_move_task = on_move_task.clone();
-        Callback::from(move |column: TaskColumn| {
-            web_sys::console::log_1(&format!("on_drop called for column: {:?}", column).into());
-            if let Some(task_id) = (*dragging_task_id).clone() {
-                web_sys::console::log_1(&format!("Dropping task: {}", task_id).into());
-                on_move_task.emit((task_id, column));
-            } else {
-                web_sys::console::log_1(&"No dragging task id found".into());
-            }
-        })
-    };
-
     // Filter tasks based on search query
     let filtered_tasks: Vec<Task> = if let Some(b) = (*board).clone() {
         if search_query.is_empty() {
@@ -380,35 +353,58 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
 
                         let on_delete = on_delete_task.clone();
                         let on_move = on_move_task.clone();
-                        let on_drag_start = on_drag_start.clone();
-                        let on_drag_end = on_drag_end.clone();
-                        let on_drop = on_drop.clone();
                         let col_clone = col.clone();
                         let dragging = (*dragging_task_id).clone();
+                        let current_hover = (*hover_column).clone();
 
-                        let ondragover = {
+                        // Mouse-based drag and drop
+                        let onmouseenter = {
+                            let hover_column = hover_column.clone();
                             let col = col.clone();
-                            Callback::from(move |e: DragEvent| {
-                                e.prevent_default();
-                                web_sys::console::log_1(&format!("ondragover on column: {:?}", col).into());
+                            Callback::from(move |_: MouseEvent| {
+                                hover_column.set(Some(col.clone()));
                             })
                         };
 
-                        let ondrop = {
-                            let on_drop = on_drop.clone();
-                            let col = col.clone();
-                            Callback::from(move |e: DragEvent| {
-                                web_sys::console::log_1(&format!("ondrop fired on column: {:?}", col).into());
-                                e.prevent_default();
-                                on_drop.emit(col.clone());
+                        let onmouseleave = {
+                            let hover_column = hover_column.clone();
+                            Callback::from(move |_: MouseEvent| {
+                                hover_column.set(None);
                             })
                         };
+
+                        let onmouseup_column = {
+                            let dragging_task_id = dragging_task_id.clone();
+                            let on_move = on_move.clone();
+                            let col = col.clone();
+                            Callback::from(move |_: MouseEvent| {
+                                if let Some(task_id) = (*dragging_task_id).clone() {
+                                    web_sys::console::log_1(&format!("Mouse drop on column: {:?}", col).into());
+                                    on_move.emit((task_id, col.clone()));
+                                    dragging_task_id.set(None);
+                                }
+                            })
+                        };
+
+                        let column_data = match col {
+                            TaskColumn::Todo => "Todo",
+                            TaskColumn::InProgress => "InProgress",
+                            TaskColumn::Done => "Done",
+                        };
+
+                        let is_hover_target = current_hover.as_ref() == Some(col) && dragging.is_some();
 
                         html! {
                             <div
-                                class={classes!("kanban-column", dragging.is_some().then_some("drag-active"))}
-                                ondragover={ondragover}
-                                ondrop={ondrop}
+                                class={classes!(
+                                    "kanban-column",
+                                    dragging.is_some().then_some("drag-active"),
+                                    is_hover_target.then_some("drag-over")
+                                )}
+                                data-column={column_data}
+                                onmouseenter={onmouseenter}
+                                onmouseleave={onmouseleave}
+                                onmouseup={onmouseup_column}
                             >
                                 <div class="kanban-column-header">
                                     <span class="column-icon">{col.icon()}</span>
@@ -420,36 +416,36 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
                                         let task_id = task.id.clone();
                                         let task_id_delete = task.id.clone();
                                         let on_delete = on_delete.clone();
-                                        let on_move = on_move.clone();
-                                        let on_drag_start = on_drag_start.clone();
-                                        let on_drag_end = on_drag_end.clone();
                                         let is_dragging = dragging.as_ref() == Some(&task.id);
 
-                                        let ondragstart = {
-                                            let on_drag_start = on_drag_start.clone();
+                                        let onmousedown_card = {
+                                            let dragging_task_id = dragging_task_id.clone();
                                             let task_id = task_id.clone();
-                                            Callback::from(move |e: DragEvent| {
-                                                web_sys::console::log_1(&format!("ondragstart fired for task: {}", task_id).into());
-                                                // Set dataTransfer via JS helper function
-                                                let web_event: &web_sys::DragEvent = e.as_ref();
-                                                set_drag_data(web_event, &task_id);
-                                                on_drag_start.emit(task_id.clone());
+                                            Callback::from(move |e: MouseEvent| {
+                                                // Don't start drag if clicking on a button
+                                                let target = e.target().unwrap();
+                                                let element: web_sys::Element = target.dyn_into().unwrap();
+                                                if element.closest("button").ok().flatten().is_some() {
+                                                    return;
+                                                }
+                                                web_sys::console::log_1(&format!("Mouse drag start: {}", task_id).into());
+                                                dragging_task_id.set(Some(task_id.clone()));
                                             })
                                         };
 
-                                        let ondragend = {
-                                            let on_drag_end = on_drag_end.clone();
-                                            Callback::from(move |_: DragEvent| {
-                                                on_drag_end.emit(());
+                                        let onmouseup_card = {
+                                            Callback::from(move |e: MouseEvent| {
+                                                // Stop propagation so column doesn't also handle it
+                                                e.stop_propagation();
                                             })
                                         };
 
                                         html! {
                                             <div
                                                 class={classes!("kanban-card", is_dragging.then_some("dragging"))}
-                                                draggable="true"
-                                                ondragstart={ondragstart}
-                                                ondragend={ondragend}
+                                                data-task-id={task.id.clone()}
+                                                onmousedown={onmousedown_card}
+                                                onmouseup={onmouseup_card}
                                             >
                                                 <div class="card-header">
                                                     <span class={classes!("priority-badge", task.priority.class())}>

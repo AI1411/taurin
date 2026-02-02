@@ -5,6 +5,25 @@
     <title>Tauri + Yew App</title>
     <link data-trunk rel="css" href="styles.css" />
     <link data-trunk rel="copy-dir" href="public" />
+    <script>
+      // Helper functions for drag and drop
+      window.setDragData = function(event, data) {
+        console.log('setDragData called with:', data, event);
+        if (event && event.dataTransfer) {
+          event.dataTransfer.setData('text/plain', data);
+          event.dataTransfer.effectAllowed = 'move';
+          console.log('dataTransfer set successfully');
+        } else {
+          console.error('No dataTransfer available on event', event);
+        }
+      };
+      window.getDragData = function(event) {
+        if (event && event.dataTransfer) {
+          return event.dataTransfer.getData('text/plain');
+        }
+        return null;
+      };
+    </script>
   </head>
   <body></body>
 </html>

@@ -1,5 +1,6 @@
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
+use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::pdf_tools::PdfTools;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -16,6 +17,7 @@ enum Tab {
     ImageCompressor,
     CsvViewer,
     PdfTools,
+    KanbanBoard,
 }
 
 fn get_file_extension(path: &str) -> Option<String> {
@@ -158,6 +160,16 @@ pub fn app() -> Html {
                     <span class="tab-icon">{"📄"}</span>
                     <span class="tab-label">{"PDF Tools"}</span>
                 </button>
+                <button
+                    class={if *active_tab == Tab::KanbanBoard { "tab-btn active" } else { "tab-btn" }}
+                    onclick={
+                        let on_click = on_tab_click.clone();
+                        Callback::from(move |_| on_click.emit(Tab::KanbanBoard))
+                    }
+                >
+                    <span class="tab-icon">{"📋"}</span>
+                    <span class="tab-label">{"Kanban"}</span>
+                </button>
             </div>
 
             <div class={if *active_tab == Tab::ImageCompressor { "tab-panel active" } else { "tab-panel" }}>
@@ -177,6 +189,9 @@ pub fn app() -> Html {
                     dropped_file={(*dropped_pdf_path).clone()}
                     on_file_processed={on_pdf_file_processed}
                 />
+            </div>
+            <div class={if *active_tab == Tab::KanbanBoard { "tab-panel active" } else { "tab-panel" }}>
+                <KanbanBoardComponent />
             </div>
         </main>
     }

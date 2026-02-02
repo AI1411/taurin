@@ -1,10 +1,15 @@
 mod csv_viewer;
 mod image_compressor;
+mod kanban;
 mod pdf_tools;
 
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
 use image_compressor::{
     compress_image, get_image_info, CompressionOptions, CompressionResult, ImageInfo,
+};
+use kanban::{
+    create_task, delete_task, load_board, move_task, update_task, KanbanBoard, Task, TaskColumn,
+    TaskPriority,
 };
 use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
@@ -79,6 +84,60 @@ fn merge_pdfs_cmd(input_paths: Vec<String>, output_path: String) -> PdfMergeResu
     merge_pdfs(&input_paths, &output_path)
 }
 
+#[tauri::command]
+fn load_kanban_board_cmd(app: tauri::AppHandle) -> Result<KanbanBoard, String> {
+    load_board(&app)
+}
+
+#[tauri::command]
+fn create_task_cmd(
+    app: tauri::AppHandle,
+    title: String,
+    description: Option<String>,
+    priority: TaskPriority,
+    assignee: Option<String>,
+    due_date: Option<String>,
+) -> Result<Task, String> {
+    create_task(&app, title, description, priority, assignee, due_date)
+}
+
+#[tauri::command]
+fn update_task_cmd(
+    app: tauri::AppHandle,
+    task_id: String,
+    title: Option<String>,
+    description: Option<String>,
+    column: Option<TaskColumn>,
+    priority: Option<TaskPriority>,
+    assignee: Option<String>,
+    due_date: Option<String>,
+) -> Result<Task, String> {
+    update_task(
+        &app,
+        task_id,
+        title,
+        description,
+        column,
+        priority,
+        assignee,
+        due_date,
+    )
+}
+
+#[tauri::command]
+fn delete_task_cmd(app: tauri::AppHandle, task_id: String) -> Result<(), String> {
+    delete_task(&app, task_id)
+}
+
+#[tauri::command]
+fn move_task_cmd(
+    app: tauri::AppHandle,
+    task_id: String,
+    column: TaskColumn,
+) -> Result<Task, String> {
+    move_task(&app, task_id, column)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -105,7 +164,12 @@ pub fn run() {
             get_pdf_info_cmd,
             split_pdf_by_pages_cmd,
             split_pdf_by_range_cmd,
-            merge_pdfs_cmd
+            merge_pdfs_cmd,
+            load_kanban_board_cmd,
+            create_task_cmd,
+            update_task_cmd,
+            delete_task_cmd,
+            move_task_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

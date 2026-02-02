@@ -1,13 +1,9 @@
 use serde::{Deserialize, Serialize};
+use std::cell::RefCell;
+use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
-
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_name = setDragData)]
-    fn set_drag_data(event: &web_sys::DragEvent, data: &str);
-}
 
 #[wasm_bindgen]
 extern "C" {
@@ -132,6 +128,8 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
     let search_query = use_state(String::new);
     let dragging_task_id = use_state(|| Option::<String>::None);
     let hover_column = use_state(|| Option::<TaskColumn>::None);
+    let drag_pos = use_state(|| (0i32, 0i32));
+    let drag_offset = use_state(|| (0i32, 0i32));
 
     // Form states
     let new_title = use_state(String::new);
@@ -154,6 +152,55 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
                 is_loading.set(false);
             });
             || {}
+        });
+    }
+
+    // Global mouse event listeners for drag and drop
+    {
+        let drag_pos = drag_pos.clone();
+        let dragging_task_id = dragging_task_id.clone();
+
+        use_effect_with((*dragging_task_id).clone(), move |dragging| {
+            let closures: Rc<RefCell<Option<(Closure<dyn Fn(web_sys::MouseEvent)>, Closure<dyn Fn(web_sys::MouseEvent)>)>>> =
+                Rc::new(RefCell::new(None));
+
+            if dragging.is_some() {
+                let document = web_sys::window().unwrap().document().unwrap();
+
+                let drag_pos_clone = drag_pos.clone();
+                let mousemove_closure = Closure::<dyn Fn(web_sys::MouseEvent)>::new(move |e: web_sys::MouseEvent| {
+                    drag_pos_clone.set((e.client_x(), e.client_y()));
+                });
+
+                let dragging_task_id_clone = dragging_task_id.clone();
+                let mouseup_closure = Closure::<dyn Fn(web_sys::MouseEvent)>::new(move |_: web_sys::MouseEvent| {
+                    dragging_task_id_clone.set(None);
+                });
+
+                document
+                    .add_event_listener_with_callback("mousemove", mousemove_closure.as_ref().unchecked_ref())
+                    .unwrap();
+                document
+                    .add_event_listener_with_callback("mouseup", mouseup_closure.as_ref().unchecked_ref())
+                    .unwrap();
+
+                *closures.borrow_mut() = Some((mousemove_closure, mouseup_closure));
+            }
+
+            let closures_clone = closures.clone();
+            move || {
+                if let Some((mousemove, mouseup)) = closures_clone.borrow_mut().take() {
+                    let document = web_sys::window().unwrap().document().unwrap();
+                    let _ = document.remove_event_listener_with_callback(
+                        "mousemove",
+                        mousemove.as_ref().unchecked_ref(),
+                    );
+                    let _ = document.remove_event_listener_with_callback(
+                        "mouseup",
+                        mouseup.as_ref().unchecked_ref(),
+                    );
+                }
+            }
         });
     }
 
@@ -318,6 +365,25 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
 
     let columns = [TaskColumn::Todo, TaskColumn::InProgress, TaskColumn::Done];
 
+    // Get dragging task for ghost rendering
+    let dragging_task: Option<Task> = if let Some(ref task_id) = *dragging_task_id {
+        filtered_tasks.iter().find(|t| &t.id == task_id).map(|t| (*t).clone())
+    } else {
+        None
+    };
+
+    let ghost_style = if dragging_task.is_some() {
+        let (x, y) = *drag_pos;
+        let (ox, oy) = *drag_offset;
+        format!(
+            "position: fixed; left: {}px; top: {}px; pointer-events: none; z-index: 10000; width: 250px; opacity: 0.9; transform: rotate(3deg);",
+            x - ox,
+            y - oy
+        )
+    } else {
+        String::new()
+    };
+
     html! {
         <div class="kanban-board">
             <h2>{"📋 Kanban Board"}</h2>
@@ -420,6 +486,8 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
 
                                         let onmousedown_card = {
                                             let dragging_task_id = dragging_task_id.clone();
+                                            let drag_pos = drag_pos.clone();
+                                            let drag_offset = drag_offset.clone();
                                             let task_id = task_id.clone();
                                             Callback::from(move |e: MouseEvent| {
                                                 // Don't start drag if clicking on a button
@@ -428,7 +496,14 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
                                                 if element.closest("button").ok().flatten().is_some() {
                                                     return;
                                                 }
-                                                web_sys::console::log_1(&format!("Mouse drag start: {}", task_id).into());
+                                                // Get card element and calculate offset
+                                                if let Some(card) = element.closest(".kanban-card").ok().flatten() {
+                                                    let rect = card.get_bounding_client_rect();
+                                                    let offset_x = e.client_x() - rect.left() as i32;
+                                                    let offset_y = e.client_y() - rect.top() as i32;
+                                                    drag_offset.set((offset_x, offset_y));
+                                                }
+                                                drag_pos.set((e.client_x(), e.client_y()));
                                                 dragging_task_id.set(Some(task_id.clone()));
                                             })
                                         };
@@ -624,6 +699,18 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
                             <button class="primary-btn" onclick={on_create_task}>{"作成"}</button>
                         </div>
                     </div>
+                </div>
+            }
+
+            // Drag ghost
+            if let Some(task) = dragging_task {
+                <div class="kanban-card drag-ghost" style={ghost_style}>
+                    <div class="card-header">
+                        <span class={classes!("priority-badge", task.priority.class())}>
+                            {task.priority.label()}
+                        </span>
+                    </div>
+                    <div class="card-title">{&task.title}</div>
                 </div>
             }
         </div>

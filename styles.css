@@ -1360,9 +1360,12 @@ body {
 }
 
 .kanban-card.dragging {
-  opacity: 0.5;
-  transform: rotate(3deg);
-  pointer-events: none;
+  opacity: 0.3;
+}
+
+.kanban-card.drag-ghost {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  background: var(--color-bg-secondary);
 }
 
 .card-header {

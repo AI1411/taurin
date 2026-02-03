@@ -2,6 +2,7 @@ mod csv_viewer;
 mod image_compressor;
 mod image_editor;
 mod kanban;
+mod markdown_to_pdf;
 mod pdf_tools;
 
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
@@ -16,6 +17,10 @@ use image_editor::{
 use kanban::{
     create_task, delete_task, load_board, move_task, update_task, KanbanBoard, Task, TaskColumn,
     TaskPriority,
+};
+use markdown_to_pdf::{
+    convert_markdown_to_pdf, markdown_to_html, read_markdown, MarkdownInfo, MarkdownToHtmlResult,
+    MarkdownToPdfResult,
 };
 use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
@@ -88,6 +93,25 @@ fn split_pdf_by_range_cmd(
 #[tauri::command]
 fn merge_pdfs_cmd(input_paths: Vec<String>, output_path: String) -> PdfMergeResult {
     merge_pdfs(&input_paths, &output_path)
+}
+
+#[tauri::command]
+fn read_markdown_cmd(path: String) -> Result<MarkdownInfo, String> {
+    read_markdown(&path)
+}
+
+#[tauri::command]
+fn markdown_to_html_cmd(markdown: String) -> MarkdownToHtmlResult {
+    markdown_to_html(&markdown)
+}
+
+#[tauri::command]
+fn convert_markdown_to_pdf_cmd(
+    markdown: String,
+    output_path: String,
+    source_path: Option<String>,
+) -> MarkdownToPdfResult {
+    convert_markdown_to_pdf(&markdown, &output_path, source_path.as_deref())
 }
 
 #[tauri::command]
@@ -242,7 +266,10 @@ pub fn run() {
             adjust_contrast_cmd,
             apply_filter_cmd,
             flip_horizontal_cmd,
-            flip_vertical_cmd
+            flip_vertical_cmd,
+            read_markdown_cmd,
+            markdown_to_html_cmd,
+            convert_markdown_to_pdf_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

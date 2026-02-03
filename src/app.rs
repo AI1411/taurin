@@ -2,6 +2,7 @@ use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
 use crate::components::kanban_board::KanbanBoardComponent;
+use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::pdf_tools::PdfTools;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -19,6 +20,7 @@ enum Tab {
     ImageEditor,
     CsvViewer,
     PdfTools,
+    MarkdownToPdf,
     KanbanBoard,
 }
 
@@ -50,6 +52,13 @@ fn is_pdf_file(path: &str) -> bool {
     matches!(get_file_extension(path).as_deref(), Some("pdf"))
 }
 
+fn is_markdown_file(path: &str) -> bool {
+    matches!(
+        get_file_extension(path).as_deref(),
+        Some("md") | Some("markdown")
+    )
+}
+
 #[function_component(App)]
 pub fn app() -> Html {
     let active_tab = use_state(|| Tab::ImageCompressor);
@@ -57,6 +66,7 @@ pub fn app() -> Html {
     let dropped_editor_path = use_state(|| Option::<String>::None);
     let dropped_csv_path = use_state(|| Option::<String>::None);
     let dropped_pdf_path = use_state(|| Option::<String>::None);
+    let dropped_markdown_path = use_state(|| Option::<String>::None);
     // Set up drag-drop event listeners (only once on mount)
     {
         let active_tab = active_tab.clone();
@@ -64,6 +74,7 @@ pub fn app() -> Html {
         let dropped_editor_path = dropped_editor_path.clone();
         let dropped_csv_path = dropped_csv_path.clone();
         let dropped_pdf_path = dropped_pdf_path.clone();
+        let dropped_markdown_path = dropped_markdown_path.clone();
 
         use_effect_with((), move |_| {
             let active_tab = active_tab.clone();
@@ -71,6 +82,7 @@ pub fn app() -> Html {
             let dropped_editor_path = dropped_editor_path.clone();
             let dropped_csv_path = dropped_csv_path.clone();
             let dropped_pdf_path = dropped_pdf_path.clone();
+            let dropped_markdown_path = dropped_markdown_path.clone();
 
             spawn_local(async move {
                 // Listen for file drop only
@@ -80,6 +92,7 @@ pub fn app() -> Html {
                     let dropped_editor_path = dropped_editor_path.clone();
                     let dropped_csv_path = dropped_csv_path.clone();
                     let dropped_pdf_path = dropped_pdf_path.clone();
+                    let dropped_markdown_path = dropped_markdown_path.clone();
                     Closure::new(move |event: JsValue| {
                         if let Ok(paths) = serde_wasm_bindgen::from_value::<DropEvent>(event) {
                             if let Some(first_path) = paths.payload.first() {
@@ -97,6 +110,9 @@ pub fn app() -> Html {
                                 } else if is_pdf_file(first_path) {
                                     dropped_pdf_path.set(Some(first_path.clone()));
                                     active_tab.set(Tab::PdfTools);
+                                } else if is_markdown_file(first_path) {
+                                    dropped_markdown_path.set(Some(first_path.clone()));
+                                    active_tab.set(Tab::MarkdownToPdf);
                                 }
                             }
                         }
@@ -145,6 +161,13 @@ pub fn app() -> Html {
         })
     };
 
+    let on_markdown_file_processed = {
+        let dropped_markdown_path = dropped_markdown_path.clone();
+        Callback::from(move |_| {
+            dropped_markdown_path.set(None);
+        })
+    };
+
     html! {
         <main class="container container-wide">
             <div class="tab-navigation">
@@ -189,6 +212,16 @@ pub fn app() -> Html {
                     <span class="tab-label">{"PDF Tools"}</span>
                 </button>
                 <button
+                    class={if *active_tab == Tab::MarkdownToPdf { "tab-btn active" } else { "tab-btn" }}
+                    onclick={
+                        let on_click = on_tab_click.clone();
+                        Callback::from(move |_| on_click.emit(Tab::MarkdownToPdf))
+                    }
+                >
+                    <span class="tab-icon">{"📝"}</span>
+                    <span class="tab-label">{"MD to PDF"}</span>
+                </button>
+                <button
                     class={if *active_tab == Tab::KanbanBoard { "tab-btn active" } else { "tab-btn" }}
                     onclick={
                         let on_click = on_tab_click.clone();
@@ -222,6 +255,12 @@ pub fn app() -> Html {
                 <PdfTools
                     dropped_file={(*dropped_pdf_path).clone()}
                     on_file_processed={on_pdf_file_processed}
+                />
+            </div>
+            <div class={if *active_tab == Tab::MarkdownToPdf { "tab-panel active" } else { "tab-panel" }}>
+                <MarkdownToPdf
+                    dropped_file={(*dropped_markdown_path).clone()}
+                    on_file_processed={on_markdown_file_processed}
                 />
             </div>
             <div class={if *active_tab == Tab::KanbanBoard { "tab-panel active" } else { "tab-panel" }}>

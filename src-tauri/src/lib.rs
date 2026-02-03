@@ -1,11 +1,17 @@
 mod csv_viewer;
 mod image_compressor;
+mod image_editor;
 mod kanban;
 mod pdf_tools;
 
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
 use image_compressor::{
     compress_image, get_image_info, CompressionOptions, CompressionResult, ImageInfo,
+};
+use image_editor::{
+    adjust_brightness, adjust_contrast, apply_filter, crop_image, flip_horizontal, flip_vertical,
+    get_editor_image_info, resize_image, rotate_image, EditResult, ImageEditorInfo, ImageFilter,
+    RotationAngle,
 };
 use kanban::{
     create_task, delete_task, load_board, move_task, update_task, KanbanBoard, Task, TaskColumn,
@@ -138,6 +144,64 @@ fn move_task_cmd(
     move_task(&app, task_id, column)
 }
 
+#[tauri::command]
+fn get_editor_image_info_cmd(path: String) -> Result<ImageEditorInfo, String> {
+    get_editor_image_info(&path)
+}
+
+#[tauri::command]
+fn resize_image_cmd(
+    input_path: String,
+    output_path: String,
+    width: u32,
+    height: u32,
+    maintain_aspect: bool,
+) -> EditResult {
+    resize_image(&input_path, &output_path, width, height, maintain_aspect)
+}
+
+#[tauri::command]
+fn rotate_image_cmd(input_path: String, output_path: String, angle: RotationAngle) -> EditResult {
+    rotate_image(&input_path, &output_path, angle)
+}
+
+#[tauri::command]
+fn crop_image_cmd(
+    input_path: String,
+    output_path: String,
+    x: u32,
+    y: u32,
+    width: u32,
+    height: u32,
+) -> EditResult {
+    crop_image(&input_path, &output_path, x, y, width, height)
+}
+
+#[tauri::command]
+fn adjust_brightness_cmd(input_path: String, output_path: String, value: i32) -> EditResult {
+    adjust_brightness(&input_path, &output_path, value)
+}
+
+#[tauri::command]
+fn adjust_contrast_cmd(input_path: String, output_path: String, value: f32) -> EditResult {
+    adjust_contrast(&input_path, &output_path, value)
+}
+
+#[tauri::command]
+fn apply_filter_cmd(input_path: String, output_path: String, filter: ImageFilter) -> EditResult {
+    apply_filter(&input_path, &output_path, filter)
+}
+
+#[tauri::command]
+fn flip_horizontal_cmd(input_path: String, output_path: String) -> EditResult {
+    flip_horizontal(&input_path, &output_path)
+}
+
+#[tauri::command]
+fn flip_vertical_cmd(input_path: String, output_path: String) -> EditResult {
+    flip_vertical(&input_path, &output_path)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -169,7 +233,16 @@ pub fn run() {
             create_task_cmd,
             update_task_cmd,
             delete_task_cmd,
-            move_task_cmd
+            move_task_cmd,
+            get_editor_image_info_cmd,
+            resize_image_cmd,
+            rotate_image_cmd,
+            crop_image_cmd,
+            adjust_brightness_cmd,
+            adjust_contrast_cmd,
+            apply_filter_cmd,
+            flip_horizontal_cmd,
+            flip_vertical_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

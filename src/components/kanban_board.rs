@@ -161,27 +161,41 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
         let dragging_task_id = dragging_task_id.clone();
 
         use_effect_with((*dragging_task_id).clone(), move |dragging| {
-            let closures: Rc<RefCell<Option<(Closure<dyn Fn(web_sys::MouseEvent)>, Closure<dyn Fn(web_sys::MouseEvent)>)>>> =
-                Rc::new(RefCell::new(None));
+            let closures: Rc<
+                RefCell<
+                    Option<(
+                        Closure<dyn Fn(web_sys::MouseEvent)>,
+                        Closure<dyn Fn(web_sys::MouseEvent)>,
+                    )>,
+                >,
+            > = Rc::new(RefCell::new(None));
 
             if dragging.is_some() {
                 let document = web_sys::window().unwrap().document().unwrap();
 
                 let drag_pos_clone = drag_pos.clone();
-                let mousemove_closure = Closure::<dyn Fn(web_sys::MouseEvent)>::new(move |e: web_sys::MouseEvent| {
-                    drag_pos_clone.set((e.client_x(), e.client_y()));
-                });
+                let mousemove_closure =
+                    Closure::<dyn Fn(web_sys::MouseEvent)>::new(move |e: web_sys::MouseEvent| {
+                        drag_pos_clone.set((e.client_x(), e.client_y()));
+                    });
 
                 let dragging_task_id_clone = dragging_task_id.clone();
-                let mouseup_closure = Closure::<dyn Fn(web_sys::MouseEvent)>::new(move |_: web_sys::MouseEvent| {
-                    dragging_task_id_clone.set(None);
-                });
+                let mouseup_closure =
+                    Closure::<dyn Fn(web_sys::MouseEvent)>::new(move |_: web_sys::MouseEvent| {
+                        dragging_task_id_clone.set(None);
+                    });
 
                 document
-                    .add_event_listener_with_callback("mousemove", mousemove_closure.as_ref().unchecked_ref())
+                    .add_event_listener_with_callback(
+                        "mousemove",
+                        mousemove_closure.as_ref().unchecked_ref(),
+                    )
                     .unwrap();
                 document
-                    .add_event_listener_with_callback("mouseup", mouseup_closure.as_ref().unchecked_ref())
+                    .add_event_listener_with_callback(
+                        "mouseup",
+                        mouseup_closure.as_ref().unchecked_ref(),
+                    )
                     .unwrap();
 
                 *closures.borrow_mut() = Some((mousemove_closure, mouseup_closure));
@@ -331,7 +345,9 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
                         }
                     }
                     Err(e) => {
-                        web_sys::console::error_1(&format!("Failed to parse result: {:?}", e).into());
+                        web_sys::console::error_1(
+                            &format!("Failed to parse result: {:?}", e).into(),
+                        );
                     }
                 }
             });
@@ -367,7 +383,10 @@ pub fn kanban_board(_props: &KanbanBoardProps) -> Html {
 
     // Get dragging task for ghost rendering
     let dragging_task: Option<Task> = if let Some(ref task_id) = *dragging_task_id {
-        filtered_tasks.iter().find(|t| &t.id == task_id).map(|t| (*t).clone())
+        filtered_tasks
+            .iter()
+            .find(|t| &t.id == task_id)
+            .map(|t| (*t).clone())
     } else {
         None
     };

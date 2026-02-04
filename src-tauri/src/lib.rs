@@ -5,6 +5,7 @@ mod kanban;
 mod markdown_to_pdf;
 mod password_generator;
 mod pdf_tools;
+mod text_diff;
 mod unit_converter;
 mod uuid_generator;
 
@@ -33,6 +34,7 @@ use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
     PdfSplitResult,
 };
+use text_diff::{compute_diff, get_file_info, DiffMode, DiffResult, FileInfo};
 use unit_converter::{
     convert_area, convert_data_size, convert_length, convert_temperature, convert_time,
     convert_volume, convert_weight, AreaUnit, ConversionResult, DataSizeUnit, LengthUnit,
@@ -148,6 +150,7 @@ fn create_task_cmd(
 }
 
 #[tauri::command]
+#[allow(clippy::too_many_arguments)]
 fn update_task_cmd(
     app: tauri::AppHandle,
     task_id: String,
@@ -306,6 +309,16 @@ fn convert_volume_cmd(value: f64, from: VolumeUnit, to: VolumeUnit) -> Conversio
     convert_volume(value, from, to)
 }
 
+#[tauri::command]
+fn compute_diff_cmd(old_text: String, new_text: String, mode: DiffMode) -> DiffResult {
+    compute_diff(&old_text, &new_text, mode)
+}
+
+#[tauri::command]
+fn get_text_file_info_cmd(path: String) -> Result<FileInfo, String> {
+    get_file_info(&path)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -360,7 +373,9 @@ pub fn run() {
             convert_temperature_cmd,
             convert_time_cmd,
             convert_area_cmd,
-            convert_volume_cmd
+            convert_volume_cmd,
+            compute_diff_cmd,
+            get_text_file_info_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

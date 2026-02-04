@@ -34,4 +34,5 @@ uuid = { version = "1", features = ["v4", "v7"] }
 pulldown-cmark = "0.12"
 regex = "1"
 rand = "0.8"
+similar = "2"
 

@@ -4,6 +4,7 @@ mod image_editor;
 mod kanban;
 mod markdown_to_pdf;
 mod pdf_tools;
+mod uuid_generator;
 
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
 use image_compressor::{
@@ -25,6 +26,10 @@ use markdown_to_pdf::{
 use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
     PdfSplitResult,
+};
+use uuid_generator::{
+    generate_uuids, validate_uuid, UuidFormat, UuidGenerateOptions, UuidGenerateResult,
+    UuidValidateResult, UuidVersion,
 };
 
 #[tauri::command]
@@ -226,6 +231,21 @@ fn flip_vertical_cmd(input_path: String, output_path: String) -> EditResult {
     flip_vertical(&input_path, &output_path)
 }
 
+#[tauri::command]
+fn generate_uuids_cmd(version: UuidVersion, format: UuidFormat, count: u32) -> UuidGenerateResult {
+    let options = UuidGenerateOptions {
+        version,
+        format,
+        count,
+    };
+    generate_uuids(options)
+}
+
+#[tauri::command]
+fn validate_uuid_cmd(input: String) -> UuidValidateResult {
+    validate_uuid(&input)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -269,7 +289,9 @@ pub fn run() {
             flip_vertical_cmd,
             read_markdown_cmd,
             markdown_to_html_cmd,
-            convert_markdown_to_pdf_cmd
+            convert_markdown_to_pdf_cmd,
+            generate_uuids_cmd,
+            validate_uuid_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

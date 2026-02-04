@@ -126,6 +126,7 @@ pub fn create_task(
     Ok(task)
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn update_task(
     app: &AppHandle,
     task_id: String,

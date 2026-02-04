@@ -5,6 +5,7 @@ use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::password_generator::PasswordGenerator;
 use crate::components::pdf_tools::PdfTools;
+use crate::components::text_diff::TextDiffComponent;
 use crate::components::unit_converter::UnitConverter;
 use crate::components::uuid_generator::UuidGenerator;
 use wasm_bindgen::prelude::*;
@@ -28,6 +29,7 @@ enum Tab {
     UuidGenerator,
     PasswordGenerator,
     UnitConverter,
+    TextDiff,
 }
 
 fn get_file_extension(path: &str) -> Option<String> {
@@ -65,6 +67,62 @@ fn is_markdown_file(path: &str) -> bool {
     )
 }
 
+fn is_text_file(path: &str) -> bool {
+    matches!(
+        get_file_extension(path).as_deref(),
+        Some("txt")
+            | Some("text")
+            | Some("log")
+            | Some("json")
+            | Some("xml")
+            | Some("yaml")
+            | Some("yml")
+            | Some("toml")
+            | Some("ini")
+            | Some("cfg")
+            | Some("conf")
+            | Some("rs")
+            | Some("js")
+            | Some("ts")
+            | Some("py")
+            | Some("go")
+            | Some("java")
+            | Some("c")
+            | Some("cpp")
+            | Some("h")
+            | Some("hpp")
+            | Some("html")
+            | Some("css")
+            | Some("scss")
+            | Some("sass")
+            | Some("less")
+            | Some("sh")
+            | Some("bash")
+            | Some("zsh")
+            | Some("sql")
+            | Some("rb")
+            | Some("php")
+            | Some("swift")
+            | Some("kt")
+            | Some("scala")
+            | Some("ex")
+            | Some("exs")
+            | Some("erl")
+            | Some("hs")
+            | Some("ml")
+            | Some("clj")
+            | Some("lisp")
+            | Some("el")
+            | Some("vim")
+            | Some("lua")
+            | Some("r")
+            | Some("m")
+            | Some("mm")
+            | Some("pl")
+            | Some("pm")
+    )
+}
+
 #[function_component(App)]
 pub fn app() -> Html {
     let active_tab = use_state(|| Tab::ImageCompressor);
@@ -73,6 +131,7 @@ pub fn app() -> Html {
     let dropped_csv_path = use_state(|| Option::<String>::None);
     let dropped_pdf_path = use_state(|| Option::<String>::None);
     let dropped_markdown_path = use_state(|| Option::<String>::None);
+    let dropped_text_path = use_state(|| Option::<String>::None);
     // Set up drag-drop event listeners (only once on mount)
     {
         let active_tab = active_tab.clone();
@@ -81,6 +140,7 @@ pub fn app() -> Html {
         let dropped_csv_path = dropped_csv_path.clone();
         let dropped_pdf_path = dropped_pdf_path.clone();
         let dropped_markdown_path = dropped_markdown_path.clone();
+        let dropped_text_path = dropped_text_path.clone();
 
         use_effect_with((), move |_| {
             let active_tab = active_tab.clone();
@@ -89,6 +149,7 @@ pub fn app() -> Html {
             let dropped_csv_path = dropped_csv_path.clone();
             let dropped_pdf_path = dropped_pdf_path.clone();
             let dropped_markdown_path = dropped_markdown_path.clone();
+            let dropped_text_path = dropped_text_path.clone();
 
             spawn_local(async move {
                 // Listen for file drop only
@@ -99,6 +160,7 @@ pub fn app() -> Html {
                     let dropped_csv_path = dropped_csv_path.clone();
                     let dropped_pdf_path = dropped_pdf_path.clone();
                     let dropped_markdown_path = dropped_markdown_path.clone();
+                    let dropped_text_path = dropped_text_path.clone();
                     Closure::new(move |event: JsValue| {
                         if let Ok(paths) = serde_wasm_bindgen::from_value::<DropEvent>(event) {
                             if let Some(first_path) = paths.payload.first() {
@@ -119,6 +181,9 @@ pub fn app() -> Html {
                                 } else if is_markdown_file(first_path) {
                                     dropped_markdown_path.set(Some(first_path.clone()));
                                     active_tab.set(Tab::MarkdownToPdf);
+                                } else if is_text_file(first_path) || *active_tab == Tab::TextDiff {
+                                    dropped_text_path.set(Some(first_path.clone()));
+                                    active_tab.set(Tab::TextDiff);
                                 }
                             }
                         }
@@ -171,6 +236,13 @@ pub fn app() -> Html {
         let dropped_markdown_path = dropped_markdown_path.clone();
         Callback::from(move |_| {
             dropped_markdown_path.set(None);
+        })
+    };
+
+    let on_text_file_processed = {
+        let dropped_text_path = dropped_text_path.clone();
+        Callback::from(move |_| {
+            dropped_text_path.set(None);
         })
     };
 
@@ -267,6 +339,16 @@ pub fn app() -> Html {
                     <span class="tab-icon">{"📏"}</span>
                     <span class="tab-label">{"Unit"}</span>
                 </button>
+                <button
+                    class={if *active_tab == Tab::TextDiff { "tab-btn active" } else { "tab-btn" }}
+                    onclick={
+                        let on_click = on_tab_click.clone();
+                        Callback::from(move |_| on_click.emit(Tab::TextDiff))
+                    }
+                >
+                    <span class="tab-icon">{"+-"}</span>
+                    <span class="tab-label">{"Diff"}</span>
+                </button>
             </div>
 
             <div class={if *active_tab == Tab::ImageCompressor { "tab-panel active" } else { "tab-panel" }}>
@@ -310,6 +392,12 @@ pub fn app() -> Html {
             </div>
             <div class={if *active_tab == Tab::UnitConverter { "tab-panel active" } else { "tab-panel" }}>
                 <UnitConverter />
+            </div>
+            <div class={if *active_tab == Tab::TextDiff { "tab-panel active" } else { "tab-panel" }}>
+                <TextDiffComponent
+                    dropped_file={(*dropped_text_path).clone()}
+                    on_file_processed={on_text_file_processed}
+                />
             </div>
         </main>
     }

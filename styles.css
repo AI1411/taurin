@@ -2649,6 +2649,422 @@ body {
   font-weight: 600;
 }
 
+/* ===== Text Diff Component ===== */
+.text-diff-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.text-diff-container .diff-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.text-diff-container .diff-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.text-diff-container .control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.text-diff-container .control-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.text-diff-container .mode-buttons {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.text-diff-container .mode-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.text-diff-container .mode-btn:hover {
+  background: var(--bg-overlay);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.text-diff-container .mode-btn.active {
+  background: var(--accent-primary-dim);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.text-diff-container .mode-icon {
+  font-weight: 700;
+}
+
+.text-diff-container .input-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.text-diff-container .input-panels {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.text-diff-container .input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 300px;
+}
+
+.text-diff-container .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+}
+
+.text-diff-container .panel-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.text-diff-container .file-name {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.text-diff-container .line-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.text-diff-container .diff-textarea {
+  flex: 1;
+  padding: var(--space-3);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  resize: none;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.text-diff-container .diff-textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-dim);
+}
+
+.text-diff-container .diff-textarea::placeholder {
+  color: var(--text-disabled);
+}
+
+.text-diff-container .swap-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-diff-container .swap-btn {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.text-diff-container .swap-btn:hover {
+  background: var(--bg-overlay);
+  border-color: var(--border-default);
+  color: var(--accent-primary);
+}
+
+.text-diff-container .action-buttons {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.text-diff-container .error-section {
+  background: var(--error-dim);
+  border-color: var(--error);
+}
+
+.text-diff-container .error-message {
+  color: var(--error);
+  margin: 0;
+}
+
+.text-diff-container .stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.text-diff-container .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.text-diff-container .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.text-diff-container .stat-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.text-diff-container .stat-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.text-diff-container .stat-item.additions .stat-value {
+  color: var(--success);
+}
+
+.text-diff-container .stat-item.deletions .stat-value {
+  color: var(--error);
+}
+
+.text-diff-container .stat-item.unchanged .stat-value {
+  color: var(--text-secondary);
+}
+
+.text-diff-container .stat-item.total .stat-value {
+  color: var(--accent-primary);
+}
+
+.text-diff-container .result-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.text-diff-container .result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.text-diff-container .copy-btn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.text-diff-container .copy-btn:hover {
+  background: var(--bg-overlay);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.text-diff-container .copy-btn.copied {
+  background: var(--success-dim);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.text-diff-container .diff-view {
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.text-diff-container .diff-view.side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.text-diff-container .diff-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-diff-container .diff-panel.old-panel {
+  border-right: 1px solid var(--border-subtle);
+}
+
+.text-diff-container .diff-panel-header {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-elevated);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.text-diff-container .diff-lines {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.text-diff-container .diff-line {
+  display: flex;
+  align-items: stretch;
+  min-height: 24px;
+}
+
+.text-diff-container .diff-line.equal {
+  background: transparent;
+}
+
+.text-diff-container .diff-line.delete {
+  background: rgba(255, 82, 82, 0.1);
+}
+
+.text-diff-container .diff-line.insert {
+  background: rgba(0, 230, 118, 0.1);
+}
+
+.text-diff-container .diff-line.empty {
+  background: var(--bg-surface);
+}
+
+.text-diff-container .line-number {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 40px;
+  padding: 0 var(--space-2);
+  color: var(--text-disabled);
+  background: var(--bg-surface);
+  font-size: var(--text-xs);
+  user-select: none;
+}
+
+.text-diff-container .diff-view.unified .line-number,
+.text-diff-container .diff-view.diff-only .line-number {
+  min-width: 35px;
+}
+
+.text-diff-container .line-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  font-weight: 700;
+  user-select: none;
+}
+
+.text-diff-container .diff-line.delete .line-prefix {
+  color: var(--error);
+}
+
+.text-diff-container .diff-line.insert .line-prefix {
+  color: var(--success);
+}
+
+.text-diff-container .line-content {
+  flex: 1;
+  padding: 0 var(--space-2);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.text-diff-container .no-diff-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* Responsive adjustments for diff */
+@media (max-width: 768px) {
+  .text-diff-container .input-panels {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .text-diff-container .swap-button-container {
+    padding: var(--space-2) 0;
+  }
+
+  .text-diff-container .swap-btn {
+    transform: rotate(90deg);
+  }
+
+  .text-diff-container .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .text-diff-container .diff-view.side-by-side {
+    grid-template-columns: 1fr;
+  }
+
+  .text-diff-container .diff-panel.old-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .text-diff-container .diff-controls {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
 /* ===== Utility Classes ===== */
 .container > h1 {
   font-family: var(--font-display);

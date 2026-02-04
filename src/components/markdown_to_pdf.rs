@@ -121,8 +121,9 @@ pub fn markdown_to_pdf(props: &MarkdownToPdfProps) -> Html {
                 let on_file_processed = on_file_processed.clone();
 
                 spawn_local(async move {
-                    let args = serde_wasm_bindgen::to_value(&ReadMarkdownArgs { path: path.clone() })
-                        .unwrap();
+                    let args =
+                        serde_wasm_bindgen::to_value(&ReadMarkdownArgs { path: path.clone() })
+                            .unwrap();
                     let info_result = invoke("read_markdown_cmd", args).await;
 
                     if let Ok(info) = serde_wasm_bindgen::from_value::<MarkdownInfo>(info_result) {

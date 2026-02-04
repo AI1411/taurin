@@ -4,6 +4,7 @@ use crate::components::image_editor::ImageEditor;
 use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::pdf_tools::PdfTools;
+use crate::components::uuid_generator::UuidGenerator;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -22,6 +23,7 @@ enum Tab {
     PdfTools,
     MarkdownToPdf,
     KanbanBoard,
+    UuidGenerator,
 }
 
 fn get_file_extension(path: &str) -> Option<String> {
@@ -231,6 +233,16 @@ pub fn app() -> Html {
                     <span class="tab-icon">{"📋"}</span>
                     <span class="tab-label">{"Kanban"}</span>
                 </button>
+                <button
+                    class={if *active_tab == Tab::UuidGenerator { "tab-btn active" } else { "tab-btn" }}
+                    onclick={
+                        let on_click = on_tab_click.clone();
+                        Callback::from(move |_| on_click.emit(Tab::UuidGenerator))
+                    }
+                >
+                    <span class="tab-icon">{"🔑"}</span>
+                    <span class="tab-label">{"UUID"}</span>
+                </button>
             </div>
 
             <div class={if *active_tab == Tab::ImageCompressor { "tab-panel active" } else { "tab-panel" }}>
@@ -265,6 +277,9 @@ pub fn app() -> Html {
             </div>
             <div class={if *active_tab == Tab::KanbanBoard { "tab-panel active" } else { "tab-panel" }}>
                 <KanbanBoardComponent />
+            </div>
+            <div class={if *active_tab == Tab::UuidGenerator { "tab-panel active" } else { "tab-panel" }}>
+                <UuidGenerator />
             </div>
         </main>
     }

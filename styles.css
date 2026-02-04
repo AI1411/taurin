@@ -2078,6 +2078,185 @@ body {
   border-radius: var(--radius-md);
 }
 
+/* ===== UUID Generator ===== */
+.uuid-generator {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.uuid-generator h2 {
+  display: none;
+}
+
+.uuid-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .uuid-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.format-example {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  word-break: break-all;
+}
+
+.generate-btn {
+  width: 100%;
+}
+
+.uuid-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.uuid-results-header h3 {
+  margin: 0;
+}
+
+.copy-all-btn {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.copy-all-btn.copied {
+  background: var(--success-dim);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.uuid-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.uuid-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.uuid-item:hover {
+  border-color: var(--border-default);
+  background: var(--bg-elevated);
+}
+
+.uuid-value {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent-primary);
+  word-break: break-all;
+  user-select: all;
+}
+
+.copy-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--bg-overlay);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.copy-btn:hover {
+  background: var(--accent-primary);
+  color: var(--bg-base);
+}
+
+.copy-btn.copied {
+  background: var(--success);
+  color: white;
+}
+
+.validate-input-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.validate-input-row .form-input {
+  flex: 1;
+}
+
+.validate-result {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  animation: slideUp var(--duration-normal) var(--ease-out);
+}
+
+.validate-result.valid {
+  background: var(--success-dim);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+}
+
+.validate-result.invalid {
+  background: var(--error-dim);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+}
+
+.validate-status {
+  font-size: var(--text-base);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+
+.validate-result.valid .validate-status {
+  color: var(--success);
+}
+
+.validate-result.invalid .validate-status {
+  color: var(--error);
+}
+
+.validate-info {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.info-label {
+  color: var(--text-tertiary);
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.validate-error {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
 /* ===== Utility Classes ===== */
 .container > h1 {
   font-family: var(--font-display);

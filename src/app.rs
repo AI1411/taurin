@@ -18,7 +18,7 @@ extern "C" {
     async fn tauri_listen(event: &str, handler: &Closure<dyn Fn(JsValue)>) -> JsValue;
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Copy)]
 enum Tab {
     ImageCompressor,
     ImageEditor,
@@ -30,6 +30,75 @@ enum Tab {
     PasswordGenerator,
     UnitConverter,
     TextDiff,
+}
+
+impl Tab {
+    fn label(&self) -> &'static str {
+        match self {
+            Tab::ImageCompressor => "Compress",
+            Tab::ImageEditor => "Edit",
+            Tab::CsvViewer => "CSV",
+            Tab::PdfTools => "PDF",
+            Tab::MarkdownToPdf => "Markdown",
+            Tab::KanbanBoard => "Kanban",
+            Tab::UuidGenerator => "UUID",
+            Tab::PasswordGenerator => "Password",
+            Tab::UnitConverter => "Unit",
+            Tab::TextDiff => "Diff",
+        }
+    }
+
+    fn icon(&self) -> &'static str {
+        match self {
+            Tab::ImageCompressor => "photo.stack",
+            Tab::ImageEditor => "paintbrush",
+            Tab::CsvViewer => "tablecells",
+            Tab::PdfTools => "doc.fill",
+            Tab::MarkdownToPdf => "doc.text",
+            Tab::KanbanBoard => "rectangle.3.group",
+            Tab::UuidGenerator => "key.fill",
+            Tab::PasswordGenerator => "lock.fill",
+            Tab::UnitConverter => "arrow.left.arrow.right",
+            Tab::TextDiff => "arrow.triangle.branch",
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+enum Category {
+    Media,
+    Documents,
+    Generators,
+    Productivity,
+}
+
+impl Category {
+    fn label(&self) -> &'static str {
+        match self {
+            Category::Media => "Media",
+            Category::Documents => "Documents",
+            Category::Generators => "Generators",
+            Category::Productivity => "Productivity",
+        }
+    }
+
+    fn tabs(&self) -> Vec<Tab> {
+        match self {
+            Category::Media => vec![Tab::ImageCompressor, Tab::ImageEditor],
+            Category::Documents => vec![
+                Tab::CsvViewer,
+                Tab::PdfTools,
+                Tab::MarkdownToPdf,
+                Tab::TextDiff,
+            ],
+            Category::Generators => vec![
+                Tab::UuidGenerator,
+                Tab::PasswordGenerator,
+                Tab::UnitConverter,
+            ],
+            Category::Productivity => vec![Tab::KanbanBoard],
+        }
+    }
 }
 
 fn get_file_extension(path: &str) -> Option<String> {
@@ -52,7 +121,7 @@ fn is_image_file(path: &str) -> bool {
 fn is_csv_file(path: &str) -> bool {
     matches!(
         get_file_extension(path).as_deref(),
-        Some("csv") | Some("tsv") | Some("txt")
+        Some("csv") | Some("tsv")
     )
 }
 
@@ -126,12 +195,14 @@ fn is_text_file(path: &str) -> bool {
 #[function_component(App)]
 pub fn app() -> Html {
     let active_tab = use_state(|| Tab::ImageCompressor);
+    let sidebar_collapsed = use_state(|| false);
     let dropped_image_path = use_state(|| Option::<String>::None);
     let dropped_editor_path = use_state(|| Option::<String>::None);
     let dropped_csv_path = use_state(|| Option::<String>::None);
     let dropped_pdf_path = use_state(|| Option::<String>::None);
     let dropped_markdown_path = use_state(|| Option::<String>::None);
     let dropped_text_path = use_state(|| Option::<String>::None);
+
     // Set up drag-drop event listeners (only once on mount)
     {
         let active_tab = active_tab.clone();
@@ -152,7 +223,6 @@ pub fn app() -> Html {
             let dropped_text_path = dropped_text_path.clone();
 
             spawn_local(async move {
-                // Listen for file drop only
                 let drop_handler = {
                     let active_tab = active_tab.clone();
                     let dropped_image_path = dropped_image_path.clone();
@@ -165,7 +235,6 @@ pub fn app() -> Html {
                         if let Ok(paths) = serde_wasm_bindgen::from_value::<DropEvent>(event) {
                             if let Some(first_path) = paths.payload.first() {
                                 if is_image_file(first_path) {
-                                    // Check if currently on ImageEditor tab, keep it there
                                     if *active_tab == Tab::ImageEditor {
                                         dropped_editor_path.set(Some(first_path.clone()));
                                     } else {
@@ -201,6 +270,13 @@ pub fn app() -> Html {
         let active_tab = active_tab.clone();
         Callback::from(move |tab: Tab| {
             active_tab.set(tab);
+        })
+    };
+
+    let on_toggle_sidebar = {
+        let sidebar_collapsed = sidebar_collapsed.clone();
+        Callback::from(move |_| {
+            sidebar_collapsed.set(!*sidebar_collapsed);
         })
     };
 
@@ -246,160 +322,203 @@ pub fn app() -> Html {
         })
     };
 
-    html! {
-        <main class="container container-wide">
-            <div class="tab-navigation">
-                <button
-                    class={if *active_tab == Tab::ImageCompressor { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::ImageCompressor))
-                    }
-                >
-                    <span class="tab-icon">{"🖼️"}</span>
-                    <span class="tab-label">{"Image Compressor"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::ImageEditor { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::ImageEditor))
-                    }
-                >
-                    <span class="tab-icon">{"🎨"}</span>
-                    <span class="tab-label">{"Image Editor"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::CsvViewer { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::CsvViewer))
-                    }
-                >
-                    <span class="tab-icon">{"📊"}</span>
-                    <span class="tab-label">{"CSV Viewer"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::PdfTools { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::PdfTools))
-                    }
-                >
-                    <span class="tab-icon">{"📄"}</span>
-                    <span class="tab-label">{"PDF Tools"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::MarkdownToPdf { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::MarkdownToPdf))
-                    }
-                >
-                    <span class="tab-icon">{"📝"}</span>
-                    <span class="tab-label">{"MD to PDF"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::KanbanBoard { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::KanbanBoard))
-                    }
-                >
-                    <span class="tab-icon">{"📋"}</span>
-                    <span class="tab-label">{"Kanban"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::UuidGenerator { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::UuidGenerator))
-                    }
-                >
-                    <span class="tab-icon">{"🔑"}</span>
-                    <span class="tab-label">{"UUID"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::PasswordGenerator { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::PasswordGenerator))
-                    }
-                >
-                    <span class="tab-icon">{"🔒"}</span>
-                    <span class="tab-label">{"Password"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::UnitConverter { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::UnitConverter))
-                    }
-                >
-                    <span class="tab-icon">{"📏"}</span>
-                    <span class="tab-label">{"Unit"}</span>
-                </button>
-                <button
-                    class={if *active_tab == Tab::TextDiff { "tab-btn active" } else { "tab-btn" }}
-                    onclick={
-                        let on_click = on_tab_click.clone();
-                        Callback::from(move |_| on_click.emit(Tab::TextDiff))
-                    }
-                >
-                    <span class="tab-icon">{"+-"}</span>
-                    <span class="tab-label">{"Diff"}</span>
-                </button>
-            </div>
+    let categories = vec![
+        Category::Media,
+        Category::Documents,
+        Category::Generators,
+        Category::Productivity,
+    ];
 
-            <div class={if *active_tab == Tab::ImageCompressor { "tab-panel active" } else { "tab-panel" }}>
-                <ImageCompressor
-                    dropped_file={(*dropped_image_path).clone()}
-                    on_file_processed={on_image_file_processed}
-                />
-            </div>
-            <div class={if *active_tab == Tab::ImageEditor { "tab-panel active" } else { "tab-panel" }}>
-                <ImageEditor
-                    dropped_file={(*dropped_editor_path).clone()}
-                    on_file_processed={on_editor_file_processed}
-                />
-            </div>
-            <div class={if *active_tab == Tab::CsvViewer { "tab-panel active" } else { "tab-panel" }}>
-                <CsvViewer
-                    dropped_file={(*dropped_csv_path).clone()}
-                    on_file_processed={on_csv_file_processed}
-                />
-            </div>
-            <div class={if *active_tab == Tab::PdfTools { "tab-panel active" } else { "tab-panel" }}>
-                <PdfTools
-                    dropped_file={(*dropped_pdf_path).clone()}
-                    on_file_processed={on_pdf_file_processed}
-                />
-            </div>
-            <div class={if *active_tab == Tab::MarkdownToPdf { "tab-panel active" } else { "tab-panel" }}>
-                <MarkdownToPdf
-                    dropped_file={(*dropped_markdown_path).clone()}
-                    on_file_processed={on_markdown_file_processed}
-                />
-            </div>
-            <div class={if *active_tab == Tab::KanbanBoard { "tab-panel active" } else { "tab-panel" }}>
-                <KanbanBoardComponent />
-            </div>
-            <div class={if *active_tab == Tab::UuidGenerator { "tab-panel active" } else { "tab-panel" }}>
-                <UuidGenerator />
-            </div>
-            <div class={if *active_tab == Tab::PasswordGenerator { "tab-panel active" } else { "tab-panel" }}>
-                <PasswordGenerator />
-            </div>
-            <div class={if *active_tab == Tab::UnitConverter { "tab-panel active" } else { "tab-panel" }}>
-                <UnitConverter />
-            </div>
-            <div class={if *active_tab == Tab::TextDiff { "tab-panel active" } else { "tab-panel" }}>
-                <TextDiffComponent
-                    dropped_file={(*dropped_text_path).clone()}
-                    on_file_processed={on_text_file_processed}
-                />
-            </div>
-        </main>
+    let sidebar_class = if *sidebar_collapsed {
+        "sidebar collapsed"
+    } else {
+        "sidebar"
+    };
+
+    html! {
+        <div class="app-layout">
+            <aside class={sidebar_class}>
+                <div class="sidebar-header">
+                    <h1 class="sidebar-title">
+                        if !*sidebar_collapsed {
+                            {"Taurin"}
+                        }
+                    </h1>
+                    <button class="sidebar-toggle" onclick={on_toggle_sidebar}>
+                        if *sidebar_collapsed {
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        } else {
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 18l-6-6 6-6"/>
+                            </svg>
+                        }
+                    </button>
+                </div>
+                <nav class="sidebar-nav">
+                    { for categories.iter().map(|category| {
+                        let tabs = category.tabs();
+                        html! {
+                            <div class="nav-group">
+                                if !*sidebar_collapsed {
+                                    <div class="nav-group-label">{category.label()}</div>
+                                }
+                                <div class="nav-items">
+                                    { for tabs.iter().map(|tab| {
+                                        let is_active = *active_tab == *tab;
+                                        let on_click = on_tab_click.clone();
+                                        let t = *tab;
+                                        html! {
+                                            <button
+                                                class={classes!("nav-item", is_active.then_some("active"))}
+                                                onclick={Callback::from(move |_| on_click.emit(t))}
+                                                title={tab.label()}
+                                            >
+                                                <span class="nav-icon">{render_icon(tab.icon())}</span>
+                                                if !*sidebar_collapsed {
+                                                    <span class="nav-label">{tab.label()}</span>
+                                                }
+                                            </button>
+                                        }
+                                    })}
+                                </div>
+                            </div>
+                        }
+                    })}
+                </nav>
+            </aside>
+            <main class="main-content">
+                <div class={if *active_tab == Tab::ImageCompressor { "content-panel active" } else { "content-panel" }}>
+                    <ImageCompressor
+                        dropped_file={(*dropped_image_path).clone()}
+                        on_file_processed={on_image_file_processed}
+                    />
+                </div>
+                <div class={if *active_tab == Tab::ImageEditor { "content-panel active" } else { "content-panel" }}>
+                    <ImageEditor
+                        dropped_file={(*dropped_editor_path).clone()}
+                        on_file_processed={on_editor_file_processed}
+                    />
+                </div>
+                <div class={if *active_tab == Tab::CsvViewer { "content-panel active" } else { "content-panel" }}>
+                    <CsvViewer
+                        dropped_file={(*dropped_csv_path).clone()}
+                        on_file_processed={on_csv_file_processed}
+                    />
+                </div>
+                <div class={if *active_tab == Tab::PdfTools { "content-panel active" } else { "content-panel" }}>
+                    <PdfTools
+                        dropped_file={(*dropped_pdf_path).clone()}
+                        on_file_processed={on_pdf_file_processed}
+                    />
+                </div>
+                <div class={if *active_tab == Tab::MarkdownToPdf { "content-panel active" } else { "content-panel" }}>
+                    <MarkdownToPdf
+                        dropped_file={(*dropped_markdown_path).clone()}
+                        on_file_processed={on_markdown_file_processed}
+                    />
+                </div>
+                <div class={if *active_tab == Tab::KanbanBoard { "content-panel active" } else { "content-panel" }}>
+                    <KanbanBoardComponent />
+                </div>
+                <div class={if *active_tab == Tab::UuidGenerator { "content-panel active" } else { "content-panel" }}>
+                    <UuidGenerator />
+                </div>
+                <div class={if *active_tab == Tab::PasswordGenerator { "content-panel active" } else { "content-panel" }}>
+                    <PasswordGenerator />
+                </div>
+                <div class={if *active_tab == Tab::UnitConverter { "content-panel active" } else { "content-panel" }}>
+                    <UnitConverter />
+                </div>
+                <div class={if *active_tab == Tab::TextDiff { "content-panel active" } else { "content-panel" }}>
+                    <TextDiffComponent
+                        dropped_file={(*dropped_text_path).clone()}
+                        on_file_processed={on_text_file_processed}
+                    />
+                </div>
+            </main>
+        </div>
+    }
+}
+
+fn render_icon(name: &str) -> Html {
+    match name {
+        "photo.stack" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+            </svg>
+        },
+        "paintbrush" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M18.37 2.63L14 7l-1.59-1.59a2 2 0 00-2.82 0L8 7l9 9 1.59-1.59a2 2 0 000-2.82L17 10l4.37-4.37a2.12 2.12 0 10-3-3z"/>
+                <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/>
+            </svg>
+        },
+        "tablecells" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <line x1="3" y1="9" x2="21" y2="9"/>
+                <line x1="3" y1="15" x2="21" y2="15"/>
+                <line x1="9" y1="3" x2="9" y2="21"/>
+                <line x1="15" y1="3" x2="15" y2="21"/>
+            </svg>
+        },
+        "doc.fill" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                <path d="M14 2v6h6" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+        },
+        "doc.text" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                <path d="M14 2v6h6"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="16" y2="17"/>
+            </svg>
+        },
+        "rectangle.3.group" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="5" height="18" rx="1"/>
+                <rect x="10" y="3" width="5" height="18" rx="1"/>
+                <rect x="17" y="3" width="5" height="18" rx="1"/>
+            </svg>
+        },
+        "key.fill" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+            </svg>
+        },
+        "lock.fill" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+        },
+        "arrow.left.arrow.right" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+            </svg>
+        },
+        "arrow.triangle.branch" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <line x1="6" y1="3" x2="6" y2="15"/>
+                <circle cx="18" cy="6" r="3"/>
+                <circle cx="6" cy="18" r="3"/>
+                <path d="M18 9a9 9 0 01-9 9"/>
+            </svg>
+        },
+        _ => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+            </svg>
+        },
     }
 }
 

@@ -2257,6 +2257,214 @@ body {
   font-family: var(--font-mono);
 }
 
+/* ===== Password Generator ===== */
+.password-generator {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.password-generator h2 {
+  display: none;
+}
+
+.password-options,
+.passphrase-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.length-slider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.length-slider input[type="range"] {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-overlay);
+  appearance: none;
+  cursor: pointer;
+}
+
+.length-slider input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary-glow);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.length-slider input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.length-input {
+  width: 80px;
+  text-align: center;
+}
+
+.char-type-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .char-type-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.checkbox-option-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.checkbox-option-inline:hover {
+  border-color: var(--border-default);
+  background: var(--bg-elevated);
+}
+
+.checkbox-option-inline input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
+
+.checkbox-option-inline span {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.exclude-option {
+  margin-top: var(--space-2);
+}
+
+.passphrase-toggles {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.passphrase-toggles .checkbox-option-inline {
+  flex: 1;
+  min-width: 150px;
+}
+
+.password-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.password-results-header h3 {
+  margin: 0;
+}
+
+.password-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.password-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.password-item:hover {
+  border-color: var(--border-default);
+  background: var(--bg-elevated);
+}
+
+.password-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.password-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent-primary);
+  word-break: break-all;
+  user-select: all;
+}
+
+.password-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.strength-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.strength-very-weak {
+  background: var(--error-dim);
+  color: var(--error);
+}
+
+.strength-weak {
+  background: rgba(255, 107, 53, 0.15);
+  color: var(--accent-secondary);
+}
+
+.strength-medium {
+  background: var(--warning-dim);
+  color: var(--warning);
+}
+
+.strength-strong {
+  background: var(--accent-primary-dim);
+  color: var(--accent-primary);
+}
+
+.strength-very-strong {
+  background: var(--success-dim);
+  color: var(--success);
+}
+
+.entropy-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
 /* ===== Utility Classes ===== */
 .container > h1 {
   font-family: var(--font-display);

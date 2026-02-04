@@ -3,6 +3,7 @@ mod image_compressor;
 mod image_editor;
 mod kanban;
 mod markdown_to_pdf;
+mod password_generator;
 mod pdf_tools;
 mod uuid_generator;
 
@@ -22,6 +23,10 @@ use kanban::{
 use markdown_to_pdf::{
     convert_markdown_to_pdf, markdown_to_html, read_markdown, MarkdownInfo, MarkdownToHtmlResult,
     MarkdownToPdfResult,
+};
+use password_generator::{
+    generate_passphrases, generate_passwords, PassphraseOptions, PasswordGenerateResult,
+    PasswordOptions,
 };
 use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
@@ -246,6 +251,16 @@ fn validate_uuid_cmd(input: String) -> UuidValidateResult {
     validate_uuid(&input)
 }
 
+#[tauri::command]
+fn generate_passwords_cmd(options: PasswordOptions) -> PasswordGenerateResult {
+    generate_passwords(options)
+}
+
+#[tauri::command]
+fn generate_passphrases_cmd(options: PassphraseOptions) -> PasswordGenerateResult {
+    generate_passphrases(options)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -291,7 +306,9 @@ pub fn run() {
             markdown_to_html_cmd,
             convert_markdown_to_pdf_cmd,
             generate_uuids_cmd,
-            validate_uuid_cmd
+            validate_uuid_cmd,
+            generate_passwords_cmd,
+            generate_passphrases_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

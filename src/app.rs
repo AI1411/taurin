@@ -3,6 +3,7 @@ use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
 use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
+use crate::components::password_generator::PasswordGenerator;
 use crate::components::pdf_tools::PdfTools;
 use crate::components::uuid_generator::UuidGenerator;
 use wasm_bindgen::prelude::*;
@@ -24,6 +25,7 @@ enum Tab {
     MarkdownToPdf,
     KanbanBoard,
     UuidGenerator,
+    PasswordGenerator,
 }
 
 fn get_file_extension(path: &str) -> Option<String> {
@@ -243,6 +245,16 @@ pub fn app() -> Html {
                     <span class="tab-icon">{"🔑"}</span>
                     <span class="tab-label">{"UUID"}</span>
                 </button>
+                <button
+                    class={if *active_tab == Tab::PasswordGenerator { "tab-btn active" } else { "tab-btn" }}
+                    onclick={
+                        let on_click = on_tab_click.clone();
+                        Callback::from(move |_| on_click.emit(Tab::PasswordGenerator))
+                    }
+                >
+                    <span class="tab-icon">{"🔒"}</span>
+                    <span class="tab-label">{"Password"}</span>
+                </button>
             </div>
 
             <div class={if *active_tab == Tab::ImageCompressor { "tab-panel active" } else { "tab-panel" }}>
@@ -280,6 +292,9 @@ pub fn app() -> Html {
             </div>
             <div class={if *active_tab == Tab::UuidGenerator { "tab-panel active" } else { "tab-panel" }}>
                 <UuidGenerator />
+            </div>
+            <div class={if *active_tab == Tab::PasswordGenerator { "tab-panel active" } else { "tab-panel" }}>
+                <PasswordGenerator />
             </div>
         </main>
     }

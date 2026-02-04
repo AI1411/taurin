@@ -5,6 +5,7 @@ mod kanban;
 mod markdown_to_pdf;
 mod password_generator;
 mod pdf_tools;
+mod unit_converter;
 mod uuid_generator;
 
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
@@ -31,6 +32,11 @@ use password_generator::{
 use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
     PdfSplitResult,
+};
+use unit_converter::{
+    convert_area, convert_data_size, convert_length, convert_temperature, convert_time,
+    convert_volume, convert_weight, AreaUnit, ConversionResult, DataSizeUnit, LengthUnit,
+    TemperatureUnit, TimeUnit, VolumeUnit, WeightUnit,
 };
 use uuid_generator::{
     generate_uuids, validate_uuid, UuidFormat, UuidGenerateOptions, UuidGenerateResult,
@@ -261,6 +267,45 @@ fn generate_passphrases_cmd(options: PassphraseOptions) -> PasswordGenerateResul
     generate_passphrases(options)
 }
 
+#[tauri::command]
+fn convert_length_cmd(value: f64, from: LengthUnit, to: LengthUnit) -> ConversionResult {
+    convert_length(value, from, to)
+}
+
+#[tauri::command]
+fn convert_weight_cmd(value: f64, from: WeightUnit, to: WeightUnit) -> ConversionResult {
+    convert_weight(value, from, to)
+}
+
+#[tauri::command]
+fn convert_data_size_cmd(value: f64, from: DataSizeUnit, to: DataSizeUnit) -> ConversionResult {
+    convert_data_size(value, from, to)
+}
+
+#[tauri::command]
+fn convert_temperature_cmd(
+    value: f64,
+    from: TemperatureUnit,
+    to: TemperatureUnit,
+) -> ConversionResult {
+    convert_temperature(value, from, to)
+}
+
+#[tauri::command]
+fn convert_time_cmd(value: f64, from: TimeUnit, to: TimeUnit) -> ConversionResult {
+    convert_time(value, from, to)
+}
+
+#[tauri::command]
+fn convert_area_cmd(value: f64, from: AreaUnit, to: AreaUnit) -> ConversionResult {
+    convert_area(value, from, to)
+}
+
+#[tauri::command]
+fn convert_volume_cmd(value: f64, from: VolumeUnit, to: VolumeUnit) -> ConversionResult {
+    convert_volume(value, from, to)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -308,7 +353,14 @@ pub fn run() {
             generate_uuids_cmd,
             validate_uuid_cmd,
             generate_passwords_cmd,
-            generate_passphrases_cmd
+            generate_passphrases_cmd,
+            convert_length_cmd,
+            convert_weight_cmd,
+            convert_data_size_cmd,
+            convert_temperature_cmd,
+            convert_time_cmd,
+            convert_area_cmd,
+            convert_volume_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

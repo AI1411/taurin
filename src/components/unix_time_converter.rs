@@ -153,6 +153,14 @@ pub fn unix_time_converter() -> Html {
         })
     };
 
+    let on_change = {
+        let input = input.clone();
+        Callback::from(move |e: Event| {
+            let target: web_sys::HtmlInputElement = e.target_unchecked_into();
+            input.set(target.value());
+        })
+    };
+
     let on_unit_change = {
         let unit = unit.clone();
         Callback::from(move |e: Event| {
@@ -431,6 +439,7 @@ pub fn unix_time_converter() -> Html {
                     }}
                     value={(*input).clone()}
                     oninput={on_input_change}
+                    onchange={on_change}
                 />
                 if *mode == Mode::DatetimeToUnix {
                     <div class="format-hint">

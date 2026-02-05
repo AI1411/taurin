@@ -61,7 +61,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "unit": "Unit",
       "diff": "Diff",
       "regex": "Regex",
-      "json": "JSON"
+      "json": "JSON",
+      "base64": "Base64"
     }
   },
   "language_switcher": {
@@ -273,6 +274,28 @@ pub const EN_TRANSLATIONS: &str = r#"{
     "input_placeholder": "Paste your JSON here...",
     "tree_placeholder": "Enter valid JSON to see the tree view",
     "error_details": "// ERROR DETAILS"
+  },
+  "base64_encoder": {
+    "title": "Base64 Encoder/Decoder",
+    "mode_encode": "Encode",
+    "mode_decode": "Decode",
+    "mode_image": "Image",
+    "url_safe": "URL Safe Base64",
+    "text_input": "Text Input",
+    "base64_input": "Base64 Input",
+    "image_input": "Image Input",
+    "text_output": "Text Output",
+    "base64_output": "Base64 Output",
+    "binary_output": "Binary Output (Hex)",
+    "encode_placeholder": "Enter text to encode...",
+    "decode_placeholder": "Enter Base64 to decode...",
+    "drop_image": "Drop an image here or click to select",
+    "supported_formats": "PNG, JPEG, GIF, WebP, SVG, BMP, AVIF",
+    "encode_btn": "Encode",
+    "decode_btn": "Decode",
+    "copy_data_url": "Copy Data URL",
+    "click_to_change": "Click to change image",
+    "original_size": "Original:"
   }
 }"#;
 
@@ -339,7 +362,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "unit": "単位",
       "diff": "差分",
       "regex": "正規表現",
-      "json": "JSON"
+      "json": "JSON",
+      "base64": "Base64"
     }
   },
   "language_switcher": {
@@ -551,5 +575,27 @@ pub const JA_TRANSLATIONS: &str = r#"{
     "input_placeholder": "JSONを貼り付け...",
     "tree_placeholder": "有効なJSONを入力するとツリービューが表示されます",
     "error_details": "// エラー詳細"
+  },
+  "base64_encoder": {
+    "title": "Base64エンコード/デコード",
+    "mode_encode": "エンコード",
+    "mode_decode": "デコード",
+    "mode_image": "画像",
+    "url_safe": "URL Safe Base64",
+    "text_input": "テキスト入力",
+    "base64_input": "Base64入力",
+    "image_input": "画像入力",
+    "text_output": "テキスト出力",
+    "base64_output": "Base64出力",
+    "binary_output": "バイナリ出力 (16進数)",
+    "encode_placeholder": "エンコードするテキストを入力...",
+    "decode_placeholder": "デコードするBase64を入力...",
+    "drop_image": "画像をドロップまたはクリックして選択",
+    "supported_formats": "PNG, JPEG, GIF, WebP, SVG, BMP, AVIF",
+    "encode_btn": "エンコード",
+    "decode_btn": "デコード",
+    "copy_data_url": "Data URLをコピー",
+    "click_to_change": "クリックで画像を変更",
+    "original_size": "元サイズ:"
   }
 }"#;

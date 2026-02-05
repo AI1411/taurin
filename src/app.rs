@@ -5,6 +5,7 @@ use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::password_generator::PasswordGenerator;
 use crate::components::pdf_tools::PdfTools;
+use crate::components::regex_tester::RegexTester;
 use crate::components::scratch_pad::ScratchPad;
 use crate::components::text_diff::TextDiffComponent;
 use crate::components::unit_converter::UnitConverter;
@@ -32,6 +33,7 @@ enum Tab {
     PasswordGenerator,
     UnitConverter,
     TextDiff,
+    RegexTester,
 }
 
 impl Tab {
@@ -48,6 +50,7 @@ impl Tab {
             Tab::PasswordGenerator => "Password",
             Tab::UnitConverter => "Unit",
             Tab::TextDiff => "Diff",
+            Tab::RegexTester => "Regex",
         }
     }
 
@@ -64,6 +67,7 @@ impl Tab {
             Tab::PasswordGenerator => "lock.fill",
             Tab::UnitConverter => "arrow.left.arrow.right",
             Tab::TextDiff => "arrow.triangle.branch",
+            Tab::RegexTester => "asterisk.circle",
         }
     }
 }
@@ -99,6 +103,7 @@ impl Category {
                 Tab::UuidGenerator,
                 Tab::PasswordGenerator,
                 Tab::UnitConverter,
+                Tab::RegexTester,
             ],
             Category::Productivity => vec![Tab::KanbanBoard, Tab::ScratchPad],
         }
@@ -444,6 +449,9 @@ pub fn app() -> Html {
                         on_file_processed={on_text_file_processed}
                     />
                 </div>
+                <div class={if *active_tab == Tab::RegexTester { "content-panel active" } else { "content-panel" }}>
+                    <RegexTester />
+                </div>
             </main>
         </div>
     }
@@ -527,6 +535,14 @@ fn render_icon(name: &str) -> Html {
                 <path d="M14 2v6h6"/>
                 <line x1="8" y1="13" x2="16" y2="13"/>
                 <line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+        },
+        "asterisk.circle" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="6" x2="12" y2="18"/>
+                <line x1="6.5" y1="9" x2="17.5" y2="15"/>
+                <line x1="6.5" y1="15" x2="17.5" y2="9"/>
             </svg>
         },
         _ => html! {

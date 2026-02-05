@@ -1,3 +1,4 @@
+use i18nrs::yew::use_translation;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -17,10 +18,10 @@ pub enum UuidVersion {
 }
 
 impl UuidVersion {
-    fn label(&self) -> &'static str {
+    fn translation_key(&self) -> &'static str {
         match self {
-            UuidVersion::V4 => "v4 (Random)",
-            UuidVersion::V7 => "v7 (Time-based)",
+            UuidVersion::V4 => "uuid_generator.version_v4",
+            UuidVersion::V7 => "uuid_generator.version_v7",
         }
     }
 }
@@ -36,14 +37,14 @@ pub enum UuidFormat {
 }
 
 impl UuidFormat {
-    fn label(&self) -> &'static str {
+    fn translation_key(&self) -> &'static str {
         match self {
-            UuidFormat::Standard => "標準",
-            UuidFormat::NoHyphens => "ハイフンなし",
-            UuidFormat::Uppercase => "大文字",
-            UuidFormat::UppercaseNoHyphens => "大文字+ハイフンなし",
-            UuidFormat::Braces => "波括弧付き",
-            UuidFormat::Urn => "URN形式",
+            UuidFormat::Standard => "uuid_generator.format_standard",
+            UuidFormat::NoHyphens => "uuid_generator.format_no_hyphens",
+            UuidFormat::Uppercase => "uuid_generator.format_uppercase",
+            UuidFormat::UppercaseNoHyphens => "uuid_generator.format_uppercase_no_hyphens",
+            UuidFormat::Braces => "uuid_generator.format_braces",
+            UuidFormat::Urn => "uuid_generator.format_urn",
         }
     }
 
@@ -96,6 +97,7 @@ struct GeneratedUuid {
 
 #[function_component(UuidGenerator)]
 pub fn uuid_generator() -> Html {
+    let (i18n, _) = use_translation();
     let selected_version = use_state(|| UuidVersion::V4);
     let selected_format = use_state(|| UuidFormat::Standard);
     let count = use_state(|| 1u32);
@@ -290,50 +292,50 @@ pub fn uuid_generator() -> Html {
         <div class="uuid-generator">
             // Generate Section
             <div class="section uuid-generate-section">
-                <h3>{"UUID 生成"}</h3>
+                <h3>{i18n.t("uuid_generator.generate_section")}</h3>
 
                 <div class="uuid-options">
                     <div class="form-group">
-                        <label>{"バージョン"}</label>
+                        <label>{i18n.t("uuid_generator.version_label")}</label>
                         <select class="form-select" onchange={on_version_change}>
                             <option value="V4" selected={*selected_version == UuidVersion::V4}>
-                                {UuidVersion::V4.label()}
+                                {i18n.t("uuid_generator.version_v4")}
                             </option>
                             <option value="V7" selected={*selected_version == UuidVersion::V7}>
-                                {UuidVersion::V7.label()}
+                                {i18n.t("uuid_generator.version_v7")}
                             </option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>{"形式"}</label>
+                        <label>{i18n.t("uuid_generator.format_label")}</label>
                         <select class="form-select" onchange={on_format_change}>
                             <option value="Standard" selected={*selected_format == UuidFormat::Standard}>
-                                {UuidFormat::Standard.label()}
+                                {i18n.t(UuidFormat::Standard.translation_key())}
                             </option>
                             <option value="NoHyphens" selected={*selected_format == UuidFormat::NoHyphens}>
-                                {UuidFormat::NoHyphens.label()}
+                                {i18n.t(UuidFormat::NoHyphens.translation_key())}
                             </option>
                             <option value="Uppercase" selected={*selected_format == UuidFormat::Uppercase}>
-                                {UuidFormat::Uppercase.label()}
+                                {i18n.t(UuidFormat::Uppercase.translation_key())}
                             </option>
                             <option value="UppercaseNoHyphens" selected={*selected_format == UuidFormat::UppercaseNoHyphens}>
-                                {UuidFormat::UppercaseNoHyphens.label()}
+                                {i18n.t(UuidFormat::UppercaseNoHyphens.translation_key())}
                             </option>
                             <option value="Braces" selected={*selected_format == UuidFormat::Braces}>
-                                {UuidFormat::Braces.label()}
+                                {i18n.t(UuidFormat::Braces.translation_key())}
                             </option>
                             <option value="Urn" selected={*selected_format == UuidFormat::Urn}>
-                                {UuidFormat::Urn.label()}
+                                {i18n.t(UuidFormat::Urn.translation_key())}
                             </option>
                         </select>
                         <div class="format-example">
-                            {"例: "}{selected_format.example()}
+                            {i18n.t("common.example")}{": "}{selected_format.example()}
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>{"生成個数"}</label>
+                        <label>{i18n.t("uuid_generator.count_label")}</label>
                         <input
                             type="number"
                             class="form-input"
@@ -353,10 +355,10 @@ pub fn uuid_generator() -> Html {
                     if *is_generating {
                         <span class="processing">
                             <span class="spinner"></span>
-                            {"生成中..."}
+                            {i18n.t("common.generating")}
                         </span>
                     } else {
-                        {"UUID を生成"}
+                        {i18n.t("common.generate")}
                     }
                 </button>
             </div>
@@ -365,15 +367,15 @@ pub fn uuid_generator() -> Html {
             if !generated_uuids.is_empty() {
                 <div class="section uuid-results-section">
                     <div class="uuid-results-header">
-                        <h3>{format!("生成結果 ({} 件)", generated_uuids.len())}</h3>
+                        <h3>{format!("{} ({})", i18n.t("uuid_generator.results_title"), generated_uuids.len())}</h3>
                         <button
                             class={classes!("secondary-btn", "copy-all-btn", (*copy_all_feedback).then_some("copied"))}
                             onclick={on_copy_all}
                         >
                             if *copy_all_feedback {
-                                {"✓ コピー完了"}
+                                {format!("✓ {}", i18n.t("common.copied"))}
                             } else {
-                                {"すべてコピー"}
+                                {i18n.t("common.copy_all")}
                             }
                         </button>
                     </div>
@@ -405,38 +407,38 @@ pub fn uuid_generator() -> Html {
 
             // Validate Section
             <div class="section uuid-validate-section">
-                <h3>{"UUID 検証"}</h3>
+                <h3>{i18n.t("uuid_generator.validate_section")}</h3>
                 <div class="validate-input-row">
                     <input
                         type="text"
                         class="form-input"
-                        placeholder="検証するUUIDを入力..."
+                        placeholder={i18n.t("uuid_generator.validate_input_placeholder")}
                         value={(*validate_input).clone()}
                         oninput={on_validate_input_change}
                     />
                     <button class="secondary-btn" onclick={on_validate}>
-                        {"検証"}
+                        {i18n.t("common.validate")}
                     </button>
                 </div>
 
                 if let Some(result) = &*validate_result {
                     <div class={classes!("validate-result", result.valid.then_some("valid").or(Some("invalid")))}>
                         if result.valid {
-                            <div class="validate-status">{"✓ 有効なUUID"}</div>
+                            <div class="validate-status">{format!("✓ {}", i18n.t("uuid_generator.valid_uuid"))}</div>
                             if let Some(version) = &result.version {
                                 <div class="validate-info">
-                                    <span class="info-label">{"バージョン:"}</span>
+                                    <span class="info-label">{i18n.t("uuid_generator.version_info")}</span>
                                     <span class="info-value">{version}</span>
                                 </div>
                             }
                             if let Some(variant) = &result.variant {
                                 <div class="validate-info">
-                                    <span class="info-label">{"バリアント:"}</span>
+                                    <span class="info-label">{i18n.t("uuid_generator.variant_info")}</span>
                                     <span class="info-value">{variant}</span>
                                 </div>
                             }
                         } else {
-                            <div class="validate-status">{"✕ 無効なUUID"}</div>
+                            <div class="validate-status">{format!("✕ {}", i18n.t("uuid_generator.invalid_uuid"))}</div>
                             if let Some(error) = &result.error {
                                 <div class="validate-error">{error}</div>
                             }

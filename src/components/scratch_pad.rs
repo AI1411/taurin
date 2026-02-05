@@ -1,4 +1,5 @@
 use gloo_timers::callback::Timeout;
+use i18nrs::yew::use_translation;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -139,11 +140,11 @@ enum ViewMode {
 }
 
 impl ViewMode {
-    fn label(&self) -> &'static str {
+    fn translation_key(&self) -> &'static str {
         match self {
-            ViewMode::Edit => "Edit",
-            ViewMode::Preview => "Preview",
-            ViewMode::Split => "Split",
+            ViewMode::Edit => "common.edit",
+            ViewMode::Preview => "common.preview",
+            ViewMode::Split => "common.split",
         }
     }
 }
@@ -153,6 +154,7 @@ pub struct ScratchPadProps {}
 
 #[function_component(ScratchPad)]
 pub fn scratch_pad(_props: &ScratchPadProps) -> Html {
+    let (i18n, _) = use_translation();
     let data = use_state(|| Option::<ScratchPadData>::None);
     let preview_html = use_state(String::new);
     let is_loading = use_state(|| true);
@@ -447,7 +449,7 @@ pub fn scratch_pad(_props: &ScratchPadProps) -> Html {
                 <div class="section">
                     <div class="scratch-pad-loading">
                         <div class="processing-spinner"></div>
-                        <p>{"Loading..."}</p>
+                        <p>{i18n.t("common.loading")}</p>
                     </div>
                 </div>
             </div>
@@ -463,8 +465,8 @@ pub fn scratch_pad(_props: &ScratchPadProps) -> Html {
                 // Sidebar
                 <div class="notes-sidebar">
                     <div class="notes-sidebar-header">
-                        <span class="notes-count">{format!("{} Notes", notes.len())}</span>
-                        <button class="new-note-btn" onclick={on_create_note} title="New Note">
+                        <span class="notes-count">{format!("{} {}", notes.len(), i18n.t("app.tabs.notes"))}</span>
+                        <button class="new-note-btn" onclick={on_create_note} title={i18n.t("scratch_pad.new_note")}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="12" y1="5" x2="12" y2="19"/>
                                 <line x1="5" y1="12" x2="19" y2="12"/>
@@ -494,7 +496,7 @@ pub fn scratch_pad(_props: &ScratchPadProps) -> Html {
                                                 e.stop_propagation();
                                                 on_delete.emit(id_for_delete.clone());
                                             })}
-                                            title="Delete"
+                                            title={i18n.t("common.delete")}
                                         >
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <line x1="18" y1="6" x2="6" y2="18"/>
@@ -518,7 +520,7 @@ pub fn scratch_pad(_props: &ScratchPadProps) -> Html {
                                 }
                             </div>
                             <div class="notes-editor-actions">
-                                <button class="export-btn" onclick={on_save_file} title="Export as file">
+                                <button class="export-btn" onclick={on_save_file} title={i18n.t("common.export")}>
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                                         <polyline points="7 10 12 15 17 10"/>
@@ -530,12 +532,13 @@ pub fn scratch_pad(_props: &ScratchPadProps) -> Html {
                                         let is_active = *view_mode == *mode;
                                         let on_click = on_view_mode_change.clone();
                                         let m = *mode;
+                                        let label = i18n.t(mode.translation_key());
                                         html! {
                                             <button
                                                 class={classes!("view-mode-tab", is_active.then_some("active"))}
                                                 onclick={Callback::from(move |_| on_click.emit(m))}
                                             >
-                                                {mode.label()}
+                                                {label}
                                             </button>
                                         }
                                     })}
@@ -580,15 +583,15 @@ Write your notes in Markdown format.
                         </div>
                         <div class="notes-editor-footer">
                             <span class="char-count">
-                                {format!("{} characters", note.content.len())}
+                                {format!("{} {}", note.content.len(), i18n.t("common.characters"))}
                             </span>
                             <span class="line-count">
-                                {format!("{} lines", note.content.lines().count().max(1))}
+                                {format!("{} {}", note.content.lines().count().max(1), i18n.t("common.lines"))}
                             </span>
                         </div>
                     } else {
                         <div class="no-note-selected">
-                            <p>{"Select a note or create a new one"}</p>
+                            <p>{i18n.t("scratch_pad.select_or_create")}</p>
                         </div>
                     }
                 </div>

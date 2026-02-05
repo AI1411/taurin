@@ -859,7 +859,7 @@ fn render_rotate_options(rotation_angle: &UseStateHandle<RotationAngle>) -> Html
                                 checked={is_selected}
                             />
                             <label>
-                                <span class="format-name">{label}</span>
+                                <span class="format-name">{*label}</span>
                             </label>
                         </div>
                     }
@@ -1050,7 +1050,7 @@ fn render_filter_options(selected_filter: &UseStateHandle<ImageFilter>) -> Html 
                     };
                     html! {
                         <div class={if is_selected { "filter-option selected" } else { "filter-option" }} onclick={on_click}>
-                            <span class="filter-name">{label}</span>
+                            <span class="filter-name">{*label}</span>
                         </div>
                     }
                 })}

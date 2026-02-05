@@ -1,3 +1,4 @@
+use i18nrs::yew::use_translation;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -88,6 +89,7 @@ pub struct ImageCompressorProps {
 
 #[function_component(ImageCompressor)]
 pub fn image_compressor(props: &ImageCompressorProps) -> Html {
+    let (i18n, _) = use_translation();
     let input_path = use_state(|| String::new());
     let image_info = use_state(|| Option::<ImageInfo>::None);
     let quality = use_state(|| 80u8);
@@ -290,8 +292,8 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
                     <div class="processing-overlay">
                         <div class="processing-content">
                             <div class="processing-spinner"></div>
-                            <p class="processing-title">{"Compressing..."}</p>
-                            <p class="processing-hint">{"Please wait while your image is being compressed"}</p>
+                            <p class="processing-title">{i18n.t("image_compressor.compressing")}</p>
+                            <p class="processing-hint">{i18n.t("image_compressor.please_wait")}</p>
                         </div>
                     </div>
                 }
@@ -303,8 +305,8 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
             <div class="section" onclick={on_select_file.clone()}>
                 <div class="drop-zone">
                     <div class="drop-zone-icon">{"🖼️"}</div>
-                    <p class="drop-zone-text">{"Click or drag & drop an image"}</p>
-                    <p class="drop-zone-hint">{"PNG, JPEG, WebP, AVIF, GIF, BMP"}</p>
+                    <p class="drop-zone-text">{i18n.t("image_compressor.click_or_drop")}</p>
+                    <p class="drop-zone-hint">{i18n.t("image_compressor.supported_formats")}</p>
                 </div>
                 {if !input_path.is_empty() {
                     html! { <p class="file-path">{&*input_path}</p> }
@@ -317,18 +319,18 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
             {if let Some(info) = &*image_info {
                 html! {
                     <div class="section info-box">
-                        <h3>{"Image Info"}</h3>
+                        <h3>{i18n.t("image_compressor.image_info")}</h3>
                         <div class="info-grid">
                             <div class="info-item">
-                                <div class="info-item-label">{"Dimensions"}</div>
+                                <div class="info-item-label">{i18n.t("image_compressor.dimensions")}</div>
                                 <div class="info-item-value">{format!("{}×{}", info.width, info.height)}</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-item-label">{"Format"}</div>
+                                <div class="info-item-label">{i18n.t("image_compressor.format")}</div>
                                 <div class="info-item-value">{&info.format}</div>
                             </div>
                             <div class="info-item">
-                                <div class="info-item-label">{"Size"}</div>
+                                <div class="info-item-label">{i18n.t("image_compressor.size")}</div>
                                 <div class="info-item-value">{format_size(info.file_size)}</div>
                             </div>
                         </div>
@@ -340,7 +342,7 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
 
             // Compression Options
             <div class="section">
-                <h3>{"Output Format"}</h3>
+                <h3>{i18n.t("image_compressor.output_format")}</h3>
                 <div class="format-options">
                     {for formats.iter().map(|(value, name, badge)| {
                         let is_selected = *output_format == *value;
@@ -361,9 +363,9 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
                                     checked={is_selected}
                                 />
                                 <label>
-                                    <span class="format-name">{name}</span>
+                                    <span class="format-name">{*name}</span>
                                     {if let Some(b) = badge {
-                                        html! { <span class="format-badge">{b}</span> }
+                                        html! { <span class="format-badge">{*b}</span> }
                                     } else {
                                         html! {}
                                     }}
@@ -375,7 +377,7 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
             </div>
 
             <div class="section">
-                <h3>{"Quality"}</h3>
+                <h3>{i18n.t("image_compressor.quality")}</h3>
                 <div class="quality-slider">
                     <input
                         type="range"
@@ -389,17 +391,17 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
             </div>
 
             <div class="section">
-                <h3>{"Resize (Optional)"}</h3>
+                <h3>{i18n.t("image_compressor.resize_optional")}</h3>
                 <div class="resize-inputs">
                     <input
                         type="number"
-                        placeholder="Width"
+                        placeholder={i18n.t("image_compressor.width")}
                         oninput={on_width_change}
                     />
                     <span>{"×"}</span>
                     <input
                         type="number"
-                        placeholder="Height"
+                        placeholder={i18n.t("image_compressor.height")}
                         oninput={on_height_change}
                     />
                 </div>
@@ -415,11 +417,11 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
                     html! {
                         <span class="processing">
                             <span class="spinner"></span>
-                            {"Processing..."}
+                            {i18n.t("common.processing")}
                         </span>
                     }
                 } else {
-                    html! { <>{"Compress & Save"}</> }
+                    html! { <>{i18n.t("image_compressor.compress_save")}</> }
                 }}
             </button>
 
@@ -430,18 +432,18 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
                         {if result.success {
                             html! {
                                 <>
-                                    <h3>{"Compression Complete!"}</h3>
+                                    <h3>{i18n.t("image_compressor.compression_complete")}</h3>
                                     <div class="result-stats">
                                         <div class="result-stat">
-                                            <div class="result-stat-label">{"Original"}</div>
+                                            <div class="result-stat-label">{i18n.t("image_compressor.original")}</div>
                                             <div class="result-stat-value original">{format_size(result.original_size)}</div>
                                         </div>
                                         <div class="result-stat">
-                                            <div class="result-stat-label">{"Compressed"}</div>
+                                            <div class="result-stat-label">{i18n.t("image_compressor.compressed")}</div>
                                             <div class="result-stat-value compressed">{format_size(result.compressed_size)}</div>
                                         </div>
                                         <div class="result-stat">
-                                            <div class="result-stat-label">{"Saved"}</div>
+                                            <div class="result-stat-label">{i18n.t("image_compressor.saved")}</div>
                                             <div class="result-stat-value saved">{format!("{:.1}%", result.compression_ratio)}</div>
                                         </div>
                                     </div>
@@ -451,7 +453,7 @@ pub fn image_compressor(props: &ImageCompressorProps) -> Html {
                         } else {
                             html! {
                                 <>
-                                    <h3>{"Compression Failed"}</h3>
+                                    <h3>{i18n.t("image_compressor.compression_failed")}</h3>
                                     <p>{result.error.clone().unwrap_or_default()}</p>
                                 </>
                             }

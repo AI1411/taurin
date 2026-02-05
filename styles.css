@@ -317,6 +317,56 @@ body {
   margin-bottom: var(--space-2);
 }
 
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
+}
+
+/* Language Switcher */
+.language-switcher {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+}
+
+.lang-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.lang-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-overlay);
+}
+
+.lang-btn.active {
+  color: var(--accent-primary);
+  background: var(--accent-primary-dim);
+}
+
+.sidebar.collapsed .language-switcher {
+  flex-direction: column;
+}
+
+.sidebar.collapsed .lang-btn {
+  padding: var(--space-2);
+}
+
 /* Main Content Area */
 .main-content {
   flex: 1;

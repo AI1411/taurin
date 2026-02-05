@@ -12,4 +12,5 @@ pub mod regex_tester;
 pub mod scratch_pad;
 pub mod text_diff;
 pub mod unit_converter;
+pub mod unix_time_converter;
 pub mod uuid_generator;

@@ -62,7 +62,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "diff": "Diff",
       "regex": "Regex",
       "json": "JSON",
-      "base64": "Base64"
+      "base64": "Base64",
+      "unix_time": "Unix Time"
     }
   },
   "language_switcher": {
@@ -296,6 +297,32 @@ pub const EN_TRANSLATIONS: &str = r#"{
     "copy_data_url": "Copy Data URL",
     "click_to_change": "Click to change image",
     "original_size": "Original:"
+  },
+  "unix_time_converter": {
+    "title": "Unix Time Converter",
+    "current_time": "Current Time",
+    "unix_seconds": "Unix (seconds)",
+    "unix_milliseconds": "Unix (milliseconds)",
+    "local_time": "Local Time",
+    "mode_unix_to_datetime": "Unix → DateTime",
+    "mode_datetime_to_unix": "DateTime → Unix",
+    "unit": "Unit",
+    "unit_seconds": "Seconds",
+    "unit_milliseconds": "Milliseconds",
+    "timezone": "Timezone",
+    "timezone_local": "Local",
+    "timezone_utc": "UTC",
+    "unix_input": "Unix Timestamp",
+    "datetime_input": "Date & Time",
+    "unix_placeholder": "Enter Unix timestamp...",
+    "datetime_placeholder": "e.g., 2024-01-01 12:00:00",
+    "format_hint": "Supported formats: YYYY-MM-DD HH:MM:SS, ISO 8601, YYYY/MM/DD, etc.",
+    "use_current": "Use Current",
+    "datetime": "Date & Time",
+    "date": "Date",
+    "time": "Time",
+    "day_of_week": "Day of Week",
+    "relative_time": "Relative Time"
   }
 }"#;
 
@@ -363,7 +390,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "diff": "差分",
       "regex": "正規表現",
       "json": "JSON",
-      "base64": "Base64"
+      "base64": "Base64",
+      "unix_time": "Unix時間"
     }
   },
   "language_switcher": {
@@ -597,5 +625,31 @@ pub const JA_TRANSLATIONS: &str = r#"{
     "copy_data_url": "Data URLをコピー",
     "click_to_change": "クリックで画像を変更",
     "original_size": "元サイズ:"
+  },
+  "unix_time_converter": {
+    "title": "Unix時間変換",
+    "current_time": "現在時刻",
+    "unix_seconds": "Unix時間（秒）",
+    "unix_milliseconds": "Unix時間（ミリ秒）",
+    "local_time": "ローカル時刻",
+    "mode_unix_to_datetime": "Unix → 日時",
+    "mode_datetime_to_unix": "日時 → Unix",
+    "unit": "単位",
+    "unit_seconds": "秒",
+    "unit_milliseconds": "ミリ秒",
+    "timezone": "タイムゾーン",
+    "timezone_local": "ローカル",
+    "timezone_utc": "UTC",
+    "unix_input": "Unixタイムスタンプ",
+    "datetime_input": "日時",
+    "unix_placeholder": "Unixタイムスタンプを入力...",
+    "datetime_placeholder": "例: 2024-01-01 12:00:00",
+    "format_hint": "対応形式: YYYY-MM-DD HH:MM:SS, ISO 8601, YYYY/MM/DD など",
+    "use_current": "現在時刻を使用",
+    "datetime": "日時",
+    "date": "日付",
+    "time": "時刻",
+    "day_of_week": "曜日",
+    "relative_time": "相対時間"
   }
 }"#;

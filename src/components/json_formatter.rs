@@ -241,7 +241,9 @@ pub fn json_formatter(props: &Props) -> Html {
                         })
                         .unwrap();
                         let res = invoke("validate_json_cmd", args).await;
-                        if let Ok(result) = serde_wasm_bindgen::from_value::<JsonValidateResult>(res) {
+                        if let Ok(result) =
+                            serde_wasm_bindgen::from_value::<JsonValidateResult>(res)
+                        {
                             validation_result.set(Some(result.clone()));
 
                             if result.valid {
@@ -261,9 +263,10 @@ pub fn json_formatter(props: &Props) -> Html {
                                 }
 
                                 // Parse to tree
-                                let args =
-                                    serde_wasm_bindgen::to_value(&ParseJsonArgs { input: input_val })
-                                        .unwrap();
+                                let args = serde_wasm_bindgen::to_value(&ParseJsonArgs {
+                                    input: input_val,
+                                })
+                                .unwrap();
                                 let res = invoke("parse_json_to_tree_cmd", args).await;
                                 if let Ok(tree_result) =
                                     serde_wasm_bindgen::from_value::<JsonParseResult>(res)

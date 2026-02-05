@@ -12,6 +12,7 @@ use crate::components::regex_tester::RegexTester;
 use crate::components::scratch_pad::ScratchPad;
 use crate::components::text_diff::TextDiffComponent;
 use crate::components::unit_converter::UnitConverter;
+use crate::components::unix_time_converter::UnixTimeConverter;
 use crate::components::uuid_generator::UuidGenerator;
 use crate::i18n::{EN_TRANSLATIONS, JA_TRANSLATIONS};
 use i18nrs::yew::{use_translation, I18nProvider, I18nProviderConfig};
@@ -38,6 +39,7 @@ enum Tab {
     UuidGenerator,
     PasswordGenerator,
     UnitConverter,
+    UnixTimeConverter,
     TextDiff,
     RegexTester,
     JsonFormatter,
@@ -57,6 +59,7 @@ impl Tab {
             Tab::UuidGenerator => "app.tabs.uuid",
             Tab::PasswordGenerator => "app.tabs.password",
             Tab::UnitConverter => "app.tabs.unit",
+            Tab::UnixTimeConverter => "app.tabs.unix_time",
             Tab::TextDiff => "app.tabs.diff",
             Tab::RegexTester => "app.tabs.regex",
             Tab::JsonFormatter => "app.tabs.json",
@@ -76,6 +79,7 @@ impl Tab {
             Tab::UuidGenerator => "key.fill",
             Tab::PasswordGenerator => "lock.fill",
             Tab::UnitConverter => "arrow.left.arrow.right",
+            Tab::UnixTimeConverter => "clock",
             Tab::TextDiff => "arrow.triangle.branch",
             Tab::RegexTester => "asterisk.circle",
             Tab::JsonFormatter => "curlybraces",
@@ -116,6 +120,7 @@ impl Category {
                 Tab::UuidGenerator,
                 Tab::PasswordGenerator,
                 Tab::UnitConverter,
+                Tab::UnixTimeConverter,
                 Tab::RegexTester,
                 Tab::Base64Encoder,
             ],
@@ -510,6 +515,9 @@ fn app_inner() -> Html {
                 <div class={if *active_tab == Tab::UnitConverter { "content-panel active" } else { "content-panel" }}>
                     <UnitConverter />
                 </div>
+                <div class={if *active_tab == Tab::UnixTimeConverter { "content-panel active" } else { "content-panel" }}>
+                    <UnixTimeConverter />
+                </div>
                 <div class={if *active_tab == Tab::TextDiff { "content-panel active" } else { "content-panel" }}>
                     <TextDiffComponent
                         dropped_file={(*dropped_text_path).clone()}
@@ -598,6 +606,12 @@ fn render_icon(name: &str) -> Html {
                 <polyline points="12 5 19 12 12 19"/>
                 <line x1="19" y1="12" x2="5" y2="12"/>
                 <polyline points="12 19 5 12 12 5"/>
+            </svg>
+        },
+        "clock" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
             </svg>
         },
         "arrow.triangle.branch" => html! {

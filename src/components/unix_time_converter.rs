@@ -7,8 +7,8 @@ use yew::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
-    async fn invoke(cmd: &str, args: JsValue) -> JsValue;
+    #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"], catch)]
+    async fn invoke(cmd: &str, args: JsValue) -> Result<JsValue, JsValue>;
 }
 
 #[derive(Clone, PartialEq, Copy)]
@@ -101,11 +101,12 @@ pub fn unix_time_converter() -> Html {
                 move || {
                     let current_time = current_time.clone();
                     spawn_local(async move {
-                        let result = invoke("get_current_unix_time_cmd", JsValue::NULL).await;
-                        if let Ok(res) =
-                            serde_wasm_bindgen::from_value::<CurrentUnixTimeResult>(result)
-                        {
-                            current_time.set(Some(res));
+                        if let Ok(result) = invoke("get_current_unix_time_cmd", JsValue::NULL).await {
+                            if let Ok(res) =
+                                serde_wasm_bindgen::from_value::<CurrentUnixTimeResult>(result)
+                            {
+                                current_time.set(Some(res));
+                            }
                         }
                     });
                 }
@@ -118,10 +119,11 @@ pub fn unix_time_converter() -> Html {
             let interval_handle = gloo_timers::callback::Interval::new(1000, move || {
                 let current_time = current_time.clone();
                 spawn_local(async move {
-                    let result = invoke("get_current_unix_time_cmd", JsValue::NULL).await;
-                    if let Ok(res) = serde_wasm_bindgen::from_value::<CurrentUnixTimeResult>(result)
-                    {
-                        current_time.set(Some(res));
+                    if let Ok(result) = invoke("get_current_unix_time_cmd", JsValue::NULL).await {
+                        if let Ok(res) = serde_wasm_bindgen::from_value::<CurrentUnixTimeResult>(result)
+                        {
+                            current_time.set(Some(res));
+                        }
                     }
                 });
             });
@@ -221,16 +223,26 @@ pub fn unix_time_converter() -> Html {
                                 timezone: current_timezone,
                             })
                             .unwrap();
-                            let result = invoke("unix_to_datetime_cmd", args).await;
 
-                            if let Ok(res) =
-                                serde_wasm_bindgen::from_value::<UnixToDatetimeResult>(result)
-                            {
-                                if res.success {
-                                    datetime_result.set(Some(res));
-                                    error.set(None);
-                                } else {
-                                    error.set(res.error);
+                            match invoke("unix_to_datetime_cmd", args).await {
+                                Ok(result) => {
+                                    match serde_wasm_bindgen::from_value::<UnixToDatetimeResult>(result) {
+                                        Ok(res) => {
+                                            if res.success {
+                                                datetime_result.set(Some(res));
+                                                error.set(None);
+                                            } else {
+                                                error.set(res.error);
+                                            }
+                                        }
+                                        Err(e) => {
+                                            error.set(Some(format!("Parse error: {:?}", e)));
+                                        }
+                                    }
+                                }
+                                Err(e) => {
+                                    let err_msg = e.as_string().unwrap_or_else(|| format!("{:?}", e));
+                                    error.set(Some(format!("Invoke error: {}", err_msg)));
                                 }
                             }
                         } else {
@@ -239,20 +251,30 @@ pub fn unix_time_converter() -> Html {
                     }
                     Mode::DatetimeToUnix => {
                         let args = serde_wasm_bindgen::to_value(&DatetimeToUnixArgs {
-                            datetime_str: input_val,
+                            datetime_str: input_val.clone(),
                             timezone: current_timezone,
                         })
                         .unwrap();
-                        let result = invoke("datetime_to_unix_cmd", args).await;
 
-                        if let Ok(res) =
-                            serde_wasm_bindgen::from_value::<DatetimeToUnixResult>(result)
-                        {
-                            if res.success {
-                                unix_result.set(Some(res));
-                                error.set(None);
-                            } else {
-                                error.set(res.error);
+                        match invoke("datetime_to_unix_cmd", args).await {
+                            Ok(result) => {
+                                match serde_wasm_bindgen::from_value::<DatetimeToUnixResult>(result) {
+                                    Ok(res) => {
+                                        if res.success {
+                                            unix_result.set(Some(res));
+                                            error.set(None);
+                                        } else {
+                                            error.set(res.error);
+                                        }
+                                    }
+                                    Err(e) => {
+                                        error.set(Some(format!("Parse error: {:?}", e)));
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                let err_msg = e.as_string().unwrap_or_else(|| format!("{:?}", e));
+                                error.set(Some(format!("Invoke error: {}", err_msg)));
                             }
                         }
                     }

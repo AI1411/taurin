@@ -1,6 +1,7 @@
 mod csv_viewer;
 mod image_compressor;
 mod image_editor;
+mod json_formatter;
 mod kanban;
 mod markdown_to_pdf;
 mod password_generator;
@@ -19,6 +20,10 @@ use image_editor::{
     adjust_brightness, adjust_contrast, apply_filter, crop_image, flip_horizontal, flip_vertical,
     get_editor_image_info, resize_image, rotate_image, EditResult, ImageEditorInfo, ImageFilter,
     RotationAngle,
+};
+use json_formatter::{
+    format_json, minify_json, parse_to_tree, search_json, validate_json, JsonFormatResult,
+    JsonMinifyResult, JsonParseResult, JsonSearchResult, JsonValidateResult,
 };
 use kanban::{
     create_task, delete_task, load_board, move_task, update_task, KanbanBoard, Task, TaskColumn,
@@ -375,6 +380,36 @@ fn export_to_file_cmd(content: String, path: String) -> Result<(), String> {
     export_to_file(content, path)
 }
 
+#[tauri::command]
+fn format_json_cmd(input: String, indent_size: usize) -> JsonFormatResult {
+    format_json(&input, indent_size)
+}
+
+#[tauri::command]
+fn validate_json_cmd(input: String) -> JsonValidateResult {
+    validate_json(&input)
+}
+
+#[tauri::command]
+fn minify_json_cmd(input: String) -> JsonMinifyResult {
+    minify_json(&input)
+}
+
+#[tauri::command]
+fn parse_json_to_tree_cmd(input: String) -> JsonParseResult {
+    parse_to_tree(&input)
+}
+
+#[tauri::command]
+fn search_json_cmd(
+    input: String,
+    query: String,
+    search_keys: bool,
+    search_values: bool,
+) -> JsonSearchResult {
+    search_json(&input, &query, search_keys, search_values)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -439,7 +474,12 @@ pub fn run() {
             update_note_cmd,
             delete_note_cmd,
             set_active_note_cmd,
-            export_to_file_cmd
+            export_to_file_cmd,
+            format_json_cmd,
+            validate_json_cmd,
+            minify_json_cmd,
+            parse_json_to_tree_cmd,
+            search_json_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

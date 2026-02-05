@@ -1,6 +1,7 @@
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
+use crate::components::json_formatter::JsonFormatter;
 use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::password_generator::PasswordGenerator;
@@ -34,6 +35,7 @@ enum Tab {
     UnitConverter,
     TextDiff,
     RegexTester,
+    JsonFormatter,
 }
 
 impl Tab {
@@ -51,6 +53,7 @@ impl Tab {
             Tab::UnitConverter => "Unit",
             Tab::TextDiff => "Diff",
             Tab::RegexTester => "Regex",
+            Tab::JsonFormatter => "JSON",
         }
     }
 
@@ -68,6 +71,7 @@ impl Tab {
             Tab::UnitConverter => "arrow.left.arrow.right",
             Tab::TextDiff => "arrow.triangle.branch",
             Tab::RegexTester => "asterisk.circle",
+            Tab::JsonFormatter => "curlybraces",
         }
     }
 }
@@ -98,6 +102,7 @@ impl Category {
                 Tab::PdfTools,
                 Tab::MarkdownToPdf,
                 Tab::TextDiff,
+                Tab::JsonFormatter,
             ],
             Category::Generators => vec![
                 Tab::UuidGenerator,
@@ -145,13 +150,16 @@ fn is_markdown_file(path: &str) -> bool {
     )
 }
 
+fn is_json_file(path: &str) -> bool {
+    matches!(get_file_extension(path).as_deref(), Some("json"))
+}
+
 fn is_text_file(path: &str) -> bool {
     matches!(
         get_file_extension(path).as_deref(),
         Some("txt")
             | Some("text")
             | Some("log")
-            | Some("json")
             | Some("xml")
             | Some("yaml")
             | Some("yml")
@@ -211,6 +219,7 @@ pub fn app() -> Html {
     let dropped_pdf_path = use_state(|| Option::<String>::None);
     let dropped_markdown_path = use_state(|| Option::<String>::None);
     let dropped_text_path = use_state(|| Option::<String>::None);
+    let dropped_json_path = use_state(|| Option::<String>::None);
 
     // Set up drag-drop event listeners (only once on mount)
     {
@@ -221,6 +230,7 @@ pub fn app() -> Html {
         let dropped_pdf_path = dropped_pdf_path.clone();
         let dropped_markdown_path = dropped_markdown_path.clone();
         let dropped_text_path = dropped_text_path.clone();
+        let dropped_json_path = dropped_json_path.clone();
 
         use_effect_with((), move |_| {
             let active_tab = active_tab.clone();
@@ -230,6 +240,7 @@ pub fn app() -> Html {
             let dropped_pdf_path = dropped_pdf_path.clone();
             let dropped_markdown_path = dropped_markdown_path.clone();
             let dropped_text_path = dropped_text_path.clone();
+            let dropped_json_path = dropped_json_path.clone();
 
             spawn_local(async move {
                 let drop_handler = {
@@ -240,6 +251,7 @@ pub fn app() -> Html {
                     let dropped_pdf_path = dropped_pdf_path.clone();
                     let dropped_markdown_path = dropped_markdown_path.clone();
                     let dropped_text_path = dropped_text_path.clone();
+                    let dropped_json_path = dropped_json_path.clone();
                     Closure::new(move |event: JsValue| {
                         if let Ok(paths) = serde_wasm_bindgen::from_value::<DropEvent>(event) {
                             if let Some(first_path) = paths.payload.first() {
@@ -259,6 +271,9 @@ pub fn app() -> Html {
                                 } else if is_markdown_file(first_path) {
                                     dropped_markdown_path.set(Some(first_path.clone()));
                                     active_tab.set(Tab::MarkdownToPdf);
+                                } else if is_json_file(first_path) {
+                                    dropped_json_path.set(Some(first_path.clone()));
+                                    active_tab.set(Tab::JsonFormatter);
                                 } else if is_text_file(first_path) || *active_tab == Tab::TextDiff {
                                     dropped_text_path.set(Some(first_path.clone()));
                                     active_tab.set(Tab::TextDiff);
@@ -328,6 +343,13 @@ pub fn app() -> Html {
         let dropped_text_path = dropped_text_path.clone();
         Callback::from(move |_| {
             dropped_text_path.set(None);
+        })
+    };
+
+    let on_json_file_processed = {
+        let dropped_json_path = dropped_json_path.clone();
+        Callback::from(move |_| {
+            dropped_json_path.set(None);
         })
     };
 
@@ -452,6 +474,12 @@ pub fn app() -> Html {
                 <div class={if *active_tab == Tab::RegexTester { "content-panel active" } else { "content-panel" }}>
                     <RegexTester />
                 </div>
+                <div class={if *active_tab == Tab::JsonFormatter { "content-panel active" } else { "content-panel" }}>
+                    <JsonFormatter
+                        dropped_file={(*dropped_json_path).clone()}
+                        on_file_processed={on_json_file_processed}
+                    />
+                </div>
             </main>
         </div>
     }
@@ -543,6 +571,12 @@ fn render_icon(name: &str) -> Html {
                 <line x1="12" y1="6" x2="12" y2="18"/>
                 <line x1="6.5" y1="9" x2="17.5" y2="15"/>
                 <line x1="6.5" y1="15" x2="17.5" y2="9"/>
+            </svg>
+        },
+        "curlybraces" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M8 3H6a2 2 0 00-2 2v4a2 2 0 01-2 2 2 2 0 012 2v4a2 2 0 002 2h2"/>
+                <path d="M16 3h2a2 2 0 012 2v4a2 2 0 002 2 2 2 0 00-2 2v4a2 2 0 01-2 2h-2"/>
             </svg>
         },
         _ => html! {

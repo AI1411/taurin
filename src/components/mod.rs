@@ -5,6 +5,7 @@ pub mod kanban_board;
 pub mod markdown_to_pdf;
 pub mod password_generator;
 pub mod pdf_tools;
+pub mod scratch_pad;
 pub mod text_diff;
 pub mod unit_converter;
 pub mod uuid_generator;

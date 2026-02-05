@@ -5,6 +5,7 @@ use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::password_generator::PasswordGenerator;
 use crate::components::pdf_tools::PdfTools;
+use crate::components::scratch_pad::ScratchPad;
 use crate::components::text_diff::TextDiffComponent;
 use crate::components::unit_converter::UnitConverter;
 use crate::components::uuid_generator::UuidGenerator;
@@ -26,6 +27,7 @@ enum Tab {
     PdfTools,
     MarkdownToPdf,
     KanbanBoard,
+    ScratchPad,
     UuidGenerator,
     PasswordGenerator,
     UnitConverter,
@@ -41,6 +43,7 @@ impl Tab {
             Tab::PdfTools => "PDF",
             Tab::MarkdownToPdf => "Markdown",
             Tab::KanbanBoard => "Kanban",
+            Tab::ScratchPad => "Notes",
             Tab::UuidGenerator => "UUID",
             Tab::PasswordGenerator => "Password",
             Tab::UnitConverter => "Unit",
@@ -56,6 +59,7 @@ impl Tab {
             Tab::PdfTools => "doc.fill",
             Tab::MarkdownToPdf => "doc.text",
             Tab::KanbanBoard => "rectangle.3.group",
+            Tab::ScratchPad => "note.text",
             Tab::UuidGenerator => "key.fill",
             Tab::PasswordGenerator => "lock.fill",
             Tab::UnitConverter => "arrow.left.arrow.right",
@@ -96,7 +100,7 @@ impl Category {
                 Tab::PasswordGenerator,
                 Tab::UnitConverter,
             ],
-            Category::Productivity => vec![Tab::KanbanBoard],
+            Category::Productivity => vec![Tab::KanbanBoard, Tab::ScratchPad],
         }
     }
 }
@@ -422,6 +426,9 @@ pub fn app() -> Html {
                 <div class={if *active_tab == Tab::KanbanBoard { "content-panel active" } else { "content-panel" }}>
                     <KanbanBoardComponent />
                 </div>
+                <div class={if *active_tab == Tab::ScratchPad { "content-panel active" } else { "content-panel" }}>
+                    <ScratchPad />
+                </div>
                 <div class={if *active_tab == Tab::UuidGenerator { "content-panel active" } else { "content-panel" }}>
                     <UuidGenerator />
                 </div>
@@ -512,6 +519,14 @@ fn render_icon(name: &str) -> Html {
                 <circle cx="18" cy="6" r="3"/>
                 <circle cx="6" cy="18" r="3"/>
                 <path d="M18 9a9 9 0 01-9 9"/>
+            </svg>
+        },
+        "note.text" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                <path d="M14 2v6h6"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="13" y2="17"/>
             </svg>
         },
         _ => html! {

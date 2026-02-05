@@ -5,6 +5,7 @@ mod kanban;
 mod markdown_to_pdf;
 mod password_generator;
 mod pdf_tools;
+mod scratch_pad;
 mod text_diff;
 mod unit_converter;
 mod uuid_generator;
@@ -33,6 +34,10 @@ use password_generator::{
 use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
     PdfSplitResult,
+};
+use scratch_pad::{
+    create_note, delete_note, export_to_file, load_scratch_pad, set_active_note, update_note, Note,
+    ScratchPadData,
 };
 use text_diff::{compute_diff, get_file_info, DiffMode, DiffResult, FileInfo};
 use unit_converter::{
@@ -319,6 +324,40 @@ fn get_text_file_info_cmd(path: String) -> Result<FileInfo, String> {
     get_file_info(&path)
 }
 
+#[tauri::command]
+fn load_scratch_pad_cmd(app: tauri::AppHandle) -> Result<ScratchPadData, String> {
+    load_scratch_pad(&app)
+}
+
+#[tauri::command]
+fn create_note_cmd(app: tauri::AppHandle) -> Result<Note, String> {
+    create_note(&app)
+}
+
+#[tauri::command]
+fn update_note_cmd(
+    app: tauri::AppHandle,
+    note_id: String,
+    content: String,
+) -> Result<Note, String> {
+    update_note(&app, note_id, content)
+}
+
+#[tauri::command]
+fn delete_note_cmd(app: tauri::AppHandle, note_id: String) -> Result<ScratchPadData, String> {
+    delete_note(&app, note_id)
+}
+
+#[tauri::command]
+fn set_active_note_cmd(app: tauri::AppHandle, note_id: String) -> Result<ScratchPadData, String> {
+    set_active_note(&app, note_id)
+}
+
+#[tauri::command]
+fn export_to_file_cmd(content: String, path: String) -> Result<(), String> {
+    export_to_file(content, path)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -375,7 +414,13 @@ pub fn run() {
             convert_area_cmd,
             convert_volume_cmd,
             compute_diff_cmd,
-            get_text_file_info_cmd
+            get_text_file_info_cmd,
+            load_scratch_pad_cmd,
+            create_note_cmd,
+            update_note_cmd,
+            delete_note_cmd,
+            set_active_note_cmd,
+            export_to_file_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

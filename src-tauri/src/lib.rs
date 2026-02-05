@@ -1,3 +1,4 @@
+mod base64_encoder;
 mod csv_viewer;
 mod image_compressor;
 mod image_editor;
@@ -12,6 +13,10 @@ mod text_diff;
 mod unit_converter;
 mod uuid_generator;
 
+use base64_encoder::{
+    decode_base64, decode_base64_image, encode_base64, encode_image_to_base64,
+    Base64DecodeImageResult, Base64DecodeResult, Base64EncodeResult, Base64ImageResult,
+};
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
 use image_compressor::{
     compress_image, get_image_info, CompressionOptions, CompressionResult, ImageInfo,
@@ -410,6 +415,26 @@ fn search_json_cmd(
     search_json(&input, &query, search_keys, search_values)
 }
 
+#[tauri::command]
+fn encode_base64_cmd(input: String, url_safe: bool) -> Base64EncodeResult {
+    encode_base64(&input, url_safe)
+}
+
+#[tauri::command]
+fn decode_base64_cmd(input: String, url_safe: bool) -> Base64DecodeResult {
+    decode_base64(&input, url_safe)
+}
+
+#[tauri::command]
+fn encode_image_to_base64_cmd(path: String) -> Base64ImageResult {
+    encode_image_to_base64(&path)
+}
+
+#[tauri::command]
+fn decode_base64_image_cmd(input: String) -> Base64DecodeImageResult {
+    decode_base64_image(&input)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -479,7 +504,11 @@ pub fn run() {
             validate_json_cmd,
             minify_json_cmd,
             parse_json_to_tree_cmd,
-            search_json_cmd
+            search_json_cmd,
+            encode_base64_cmd,
+            decode_base64_cmd,
+            encode_image_to_base64_cmd,
+            decode_base64_image_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

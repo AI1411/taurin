@@ -1,3 +1,4 @@
+use crate::components::base64_encoder::Base64Encoder;
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
@@ -13,7 +14,7 @@ use crate::components::text_diff::TextDiffComponent;
 use crate::components::unit_converter::UnitConverter;
 use crate::components::uuid_generator::UuidGenerator;
 use crate::i18n::{EN_TRANSLATIONS, JA_TRANSLATIONS};
-use i18nrs::yew::{I18nProvider, I18nProviderConfig, use_translation};
+use i18nrs::yew::{use_translation, I18nProvider, I18nProviderConfig};
 use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -40,6 +41,7 @@ enum Tab {
     TextDiff,
     RegexTester,
     JsonFormatter,
+    Base64Encoder,
 }
 
 impl Tab {
@@ -58,6 +60,7 @@ impl Tab {
             Tab::TextDiff => "app.tabs.diff",
             Tab::RegexTester => "app.tabs.regex",
             Tab::JsonFormatter => "app.tabs.json",
+            Tab::Base64Encoder => "app.tabs.base64",
         }
     }
 
@@ -76,6 +79,7 @@ impl Tab {
             Tab::TextDiff => "arrow.triangle.branch",
             Tab::RegexTester => "asterisk.circle",
             Tab::JsonFormatter => "curlybraces",
+            Tab::Base64Encoder => "doc.badge.gearshape",
         }
     }
 }
@@ -113,6 +117,7 @@ impl Category {
                 Tab::PasswordGenerator,
                 Tab::UnitConverter,
                 Tab::RegexTester,
+                Tab::Base64Encoder,
             ],
             Category::Productivity => vec![Tab::KanbanBoard, Tab::ScratchPad],
         }
@@ -215,10 +220,7 @@ fn is_text_file(path: &str) -> bool {
 
 #[function_component(App)]
 pub fn app() -> Html {
-    let translations = HashMap::from([
-        ("en", EN_TRANSLATIONS),
-        ("ja", JA_TRANSLATIONS),
-    ]);
+    let translations = HashMap::from([("en", EN_TRANSLATIONS), ("ja", JA_TRANSLATIONS)]);
 
     let config = I18nProviderConfig {
         translations,
@@ -245,6 +247,7 @@ fn app_inner() -> Html {
     let dropped_markdown_path = use_state(|| Option::<String>::None);
     let dropped_text_path = use_state(|| Option::<String>::None);
     let dropped_json_path = use_state(|| Option::<String>::None);
+    let dropped_base64_image_path = use_state(|| Option::<String>::None);
 
     // Set up drag-drop event listeners (only once on mount)
     {
@@ -256,6 +259,7 @@ fn app_inner() -> Html {
         let dropped_markdown_path = dropped_markdown_path.clone();
         let dropped_text_path = dropped_text_path.clone();
         let dropped_json_path = dropped_json_path.clone();
+        let dropped_base64_image_path = dropped_base64_image_path.clone();
 
         use_effect_with((), move |_| {
             let active_tab = active_tab.clone();
@@ -266,6 +270,7 @@ fn app_inner() -> Html {
             let dropped_markdown_path = dropped_markdown_path.clone();
             let dropped_text_path = dropped_text_path.clone();
             let dropped_json_path = dropped_json_path.clone();
+            let dropped_base64_image_path = dropped_base64_image_path.clone();
 
             spawn_local(async move {
                 let drop_handler = {
@@ -277,12 +282,15 @@ fn app_inner() -> Html {
                     let dropped_markdown_path = dropped_markdown_path.clone();
                     let dropped_text_path = dropped_text_path.clone();
                     let dropped_json_path = dropped_json_path.clone();
+                    let dropped_base64_image_path = dropped_base64_image_path.clone();
                     Closure::new(move |event: JsValue| {
                         if let Ok(paths) = serde_wasm_bindgen::from_value::<DropEvent>(event) {
                             if let Some(first_path) = paths.payload.first() {
                                 if is_image_file(first_path) {
                                     if *active_tab == Tab::ImageEditor {
                                         dropped_editor_path.set(Some(first_path.clone()));
+                                    } else if *active_tab == Tab::Base64Encoder {
+                                        dropped_base64_image_path.set(Some(first_path.clone()));
                                     } else {
                                         dropped_image_path.set(Some(first_path.clone()));
                                         active_tab.set(Tab::ImageCompressor);
@@ -375,6 +383,13 @@ fn app_inner() -> Html {
         let dropped_json_path = dropped_json_path.clone();
         Callback::from(move |_| {
             dropped_json_path.set(None);
+        })
+    };
+
+    let on_base64_image_file_processed = {
+        let dropped_base64_image_path = dropped_base64_image_path.clone();
+        Callback::from(move |_| {
+            dropped_base64_image_path.set(None);
         })
     };
 
@@ -510,6 +525,12 @@ fn app_inner() -> Html {
                         on_file_processed={on_json_file_processed}
                     />
                 </div>
+                <div class={if *active_tab == Tab::Base64Encoder { "content-panel active" } else { "content-panel" }}>
+                    <Base64Encoder
+                        dropped_file={(*dropped_base64_image_path).clone()}
+                        on_file_processed={on_base64_image_file_processed}
+                    />
+                </div>
             </main>
         </div>
     }
@@ -607,6 +628,13 @@ fn render_icon(name: &str) -> Html {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M8 3H6a2 2 0 00-2 2v4a2 2 0 01-2 2 2 2 0 012 2v4a2 2 0 002 2h2"/>
                 <path d="M16 3h2a2 2 0 012 2v4a2 2 0 002 2 2 2 0 00-2 2v4a2 2 0 01-2 2h-2"/>
+            </svg>
+        },
+        "doc.badge.gearshape" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                <path d="M14 2v6h6"/>
+                <text x="8" y="17" font-size="8" font-weight="bold" fill="currentColor">{"64"}</text>
             </svg>
         },
         _ => html! {

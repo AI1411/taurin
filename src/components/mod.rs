@@ -1,6 +1,7 @@
 pub mod csv_viewer;
 pub mod image_compressor;
 pub mod image_editor;
+pub mod json_formatter;
 pub mod kanban_board;
 pub mod markdown_to_pdf;
 pub mod password_generator;

@@ -1,3 +1,4 @@
+use i18nrs::yew::use_translation;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -22,15 +23,15 @@ pub enum UnitCategory {
 }
 
 impl UnitCategory {
-    fn label(&self) -> &'static str {
+    fn translation_key(&self) -> &'static str {
         match self {
-            UnitCategory::Length => "長さ",
-            UnitCategory::Weight => "重さ",
-            UnitCategory::DataSize => "データ容量",
-            UnitCategory::Temperature => "温度",
-            UnitCategory::Time => "時間",
-            UnitCategory::Area => "面積",
-            UnitCategory::Volume => "体積",
+            UnitCategory::Length => "unit_converter.category_length",
+            UnitCategory::Weight => "unit_converter.category_weight",
+            UnitCategory::DataSize => "unit_converter.category_data_size",
+            UnitCategory::Temperature => "unit_converter.category_temperature",
+            UnitCategory::Time => "unit_converter.category_time",
+            UnitCategory::Area => "unit_converter.category_area",
+            UnitCategory::Volume => "unit_converter.category_volume",
         }
     }
 
@@ -72,16 +73,29 @@ pub enum LengthUnit {
 }
 
 impl LengthUnit {
+    fn translation_key(&self) -> &'static str {
+        match self {
+            LengthUnit::Meter => "unit_converter.length_meter",
+            LengthUnit::Centimeter => "unit_converter.length_centimeter",
+            LengthUnit::Millimeter => "unit_converter.length_millimeter",
+            LengthUnit::Kilometer => "unit_converter.length_kilometer",
+            LengthUnit::Inch => "unit_converter.length_inch",
+            LengthUnit::Feet => "unit_converter.length_feet",
+            LengthUnit::Yard => "unit_converter.length_yard",
+            LengthUnit::Mile => "unit_converter.length_mile",
+        }
+    }
+
     fn label(&self) -> &'static str {
         match self {
-            LengthUnit::Meter => "メートル (m)",
-            LengthUnit::Centimeter => "センチメートル (cm)",
-            LengthUnit::Millimeter => "ミリメートル (mm)",
-            LengthUnit::Kilometer => "キロメートル (km)",
-            LengthUnit::Inch => "インチ (in)",
-            LengthUnit::Feet => "フィート (ft)",
-            LengthUnit::Yard => "ヤード (yd)",
-            LengthUnit::Mile => "マイル (mi)",
+            LengthUnit::Meter => "m",
+            LengthUnit::Centimeter => "cm",
+            LengthUnit::Millimeter => "mm",
+            LengthUnit::Kilometer => "km",
+            LengthUnit::Inch => "in",
+            LengthUnit::Feet => "ft",
+            LengthUnit::Yard => "yd",
+            LengthUnit::Mile => "mi",
         }
     }
 
@@ -110,14 +124,25 @@ pub enum WeightUnit {
 }
 
 impl WeightUnit {
+    fn translation_key(&self) -> &'static str {
+        match self {
+            WeightUnit::Kilogram => "unit_converter.weight_kilogram",
+            WeightUnit::Gram => "unit_converter.weight_gram",
+            WeightUnit::Milligram => "unit_converter.weight_milligram",
+            WeightUnit::Pound => "unit_converter.weight_pound",
+            WeightUnit::Ounce => "unit_converter.weight_ounce",
+            WeightUnit::Ton => "unit_converter.weight_ton",
+        }
+    }
+
     fn label(&self) -> &'static str {
         match self {
-            WeightUnit::Kilogram => "キログラム (kg)",
-            WeightUnit::Gram => "グラム (g)",
-            WeightUnit::Milligram => "ミリグラム (mg)",
-            WeightUnit::Pound => "ポンド (lb)",
-            WeightUnit::Ounce => "オンス (oz)",
-            WeightUnit::Ton => "トン (t)",
+            WeightUnit::Kilogram => "kg",
+            WeightUnit::Gram => "g",
+            WeightUnit::Milligram => "mg",
+            WeightUnit::Pound => "lb",
+            WeightUnit::Ounce => "oz",
+            WeightUnit::Ton => "t",
         }
     }
 
@@ -148,18 +173,33 @@ pub enum DataSizeUnit {
 }
 
 impl DataSizeUnit {
+    fn translation_key(&self) -> &'static str {
+        match self {
+            DataSizeUnit::Byte => "unit_converter.data_byte",
+            DataSizeUnit::Kilobyte => "unit_converter.data_kilobyte",
+            DataSizeUnit::Megabyte => "unit_converter.data_megabyte",
+            DataSizeUnit::Gigabyte => "unit_converter.data_gigabyte",
+            DataSizeUnit::Terabyte => "unit_converter.data_terabyte",
+            DataSizeUnit::Petabyte => "unit_converter.data_petabyte",
+            DataSizeUnit::Kibibyte => "unit_converter.data_kibibyte",
+            DataSizeUnit::Mebibyte => "unit_converter.data_mebibyte",
+            DataSizeUnit::Gibibyte => "unit_converter.data_gibibyte",
+            DataSizeUnit::Tebibyte => "unit_converter.data_tebibyte",
+        }
+    }
+
     fn label(&self) -> &'static str {
         match self {
-            DataSizeUnit::Byte => "バイト (B)",
-            DataSizeUnit::Kilobyte => "キロバイト (KB)",
-            DataSizeUnit::Megabyte => "メガバイト (MB)",
-            DataSizeUnit::Gigabyte => "ギガバイト (GB)",
-            DataSizeUnit::Terabyte => "テラバイト (TB)",
-            DataSizeUnit::Petabyte => "ペタバイト (PB)",
-            DataSizeUnit::Kibibyte => "キビバイト (KiB)",
-            DataSizeUnit::Mebibyte => "メビバイト (MiB)",
-            DataSizeUnit::Gibibyte => "ギビバイト (GiB)",
-            DataSizeUnit::Tebibyte => "テビバイト (TiB)",
+            DataSizeUnit::Byte => "B",
+            DataSizeUnit::Kilobyte => "KB",
+            DataSizeUnit::Megabyte => "MB",
+            DataSizeUnit::Gigabyte => "GB",
+            DataSizeUnit::Terabyte => "TB",
+            DataSizeUnit::Petabyte => "PB",
+            DataSizeUnit::Kibibyte => "KiB",
+            DataSizeUnit::Mebibyte => "MiB",
+            DataSizeUnit::Gibibyte => "GiB",
+            DataSizeUnit::Tebibyte => "TiB",
         }
     }
 
@@ -187,11 +227,19 @@ pub enum TemperatureUnit {
 }
 
 impl TemperatureUnit {
+    fn translation_key(&self) -> &'static str {
+        match self {
+            TemperatureUnit::Celsius => "unit_converter.temp_celsius",
+            TemperatureUnit::Fahrenheit => "unit_converter.temp_fahrenheit",
+            TemperatureUnit::Kelvin => "unit_converter.temp_kelvin",
+        }
+    }
+
     fn label(&self) -> &'static str {
         match self {
-            TemperatureUnit::Celsius => "摂氏 (℃)",
-            TemperatureUnit::Fahrenheit => "華氏 (℉)",
-            TemperatureUnit::Kelvin => "ケルビン (K)",
+            TemperatureUnit::Celsius => "°C",
+            TemperatureUnit::Fahrenheit => "°F",
+            TemperatureUnit::Kelvin => "K",
         }
     }
 
@@ -216,15 +264,27 @@ pub enum TimeUnit {
 }
 
 impl TimeUnit {
+    fn translation_key(&self) -> &'static str {
+        match self {
+            TimeUnit::Second => "unit_converter.time_second",
+            TimeUnit::Minute => "unit_converter.time_minute",
+            TimeUnit::Hour => "unit_converter.time_hour",
+            TimeUnit::Day => "unit_converter.time_day",
+            TimeUnit::Week => "unit_converter.time_week",
+            TimeUnit::Month => "unit_converter.time_month",
+            TimeUnit::Year => "unit_converter.time_year",
+        }
+    }
+
     fn label(&self) -> &'static str {
         match self {
-            TimeUnit::Second => "秒 (s)",
-            TimeUnit::Minute => "分 (min)",
-            TimeUnit::Hour => "時間 (h)",
-            TimeUnit::Day => "日",
-            TimeUnit::Week => "週",
-            TimeUnit::Month => "月",
-            TimeUnit::Year => "年",
+            TimeUnit::Second => "s",
+            TimeUnit::Minute => "min",
+            TimeUnit::Hour => "h",
+            TimeUnit::Day => "day",
+            TimeUnit::Week => "week",
+            TimeUnit::Month => "month",
+            TimeUnit::Year => "year",
         }
     }
 
@@ -254,16 +314,29 @@ pub enum AreaUnit {
 }
 
 impl AreaUnit {
+    fn translation_key(&self) -> &'static str {
+        match self {
+            AreaUnit::SquareMeter => "unit_converter.area_sqmeter",
+            AreaUnit::SquareKilometer => "unit_converter.area_sqkilometer",
+            AreaUnit::SquareCentimeter => "unit_converter.area_sqcentimeter",
+            AreaUnit::SquareFeet => "unit_converter.area_sqfeet",
+            AreaUnit::SquareInch => "unit_converter.area_sqinch",
+            AreaUnit::Hectare => "unit_converter.area_hectare",
+            AreaUnit::Acre => "unit_converter.area_acre",
+            AreaUnit::Tsubo => "unit_converter.area_tsubo",
+        }
+    }
+
     fn label(&self) -> &'static str {
         match self {
-            AreaUnit::SquareMeter => "平方メートル (m²)",
-            AreaUnit::SquareKilometer => "平方キロメートル (km²)",
-            AreaUnit::SquareCentimeter => "平方センチメートル (cm²)",
-            AreaUnit::SquareFeet => "平方フィート (ft²)",
-            AreaUnit::SquareInch => "平方インチ (in²)",
-            AreaUnit::Hectare => "ヘクタール (ha)",
-            AreaUnit::Acre => "エーカー (ac)",
-            AreaUnit::Tsubo => "坪",
+            AreaUnit::SquareMeter => "m²",
+            AreaUnit::SquareKilometer => "km²",
+            AreaUnit::SquareCentimeter => "cm²",
+            AreaUnit::SquareFeet => "ft²",
+            AreaUnit::SquareInch => "in²",
+            AreaUnit::Hectare => "ha",
+            AreaUnit::Acre => "ac",
+            AreaUnit::Tsubo => "tsubo",
         }
     }
 
@@ -294,16 +367,29 @@ pub enum VolumeUnit {
 }
 
 impl VolumeUnit {
+    fn translation_key(&self) -> &'static str {
+        match self {
+            VolumeUnit::Liter => "unit_converter.volume_liter",
+            VolumeUnit::Milliliter => "unit_converter.volume_milliliter",
+            VolumeUnit::CubicMeter => "unit_converter.volume_cubicmeter",
+            VolumeUnit::CubicCentimeter => "unit_converter.volume_cubiccentimeter",
+            VolumeUnit::Gallon => "unit_converter.volume_gallon",
+            VolumeUnit::Quart => "unit_converter.volume_quart",
+            VolumeUnit::Pint => "unit_converter.volume_pint",
+            VolumeUnit::Cup => "unit_converter.volume_cup",
+        }
+    }
+
     fn label(&self) -> &'static str {
         match self {
-            VolumeUnit::Liter => "リットル (L)",
-            VolumeUnit::Milliliter => "ミリリットル (mL)",
-            VolumeUnit::CubicMeter => "立方メートル (m³)",
-            VolumeUnit::CubicCentimeter => "立方センチメートル (cm³)",
-            VolumeUnit::Gallon => "ガロン (gal)",
-            VolumeUnit::Quart => "クォート (qt)",
-            VolumeUnit::Pint => "パイント (pt)",
-            VolumeUnit::Cup => "カップ",
+            VolumeUnit::Liter => "L",
+            VolumeUnit::Milliliter => "mL",
+            VolumeUnit::CubicMeter => "m³",
+            VolumeUnit::CubicCentimeter => "cm³",
+            VolumeUnit::Gallon => "gal",
+            VolumeUnit::Quart => "qt",
+            VolumeUnit::Pint => "pt",
+            VolumeUnit::Cup => "cup",
         }
     }
 
@@ -398,6 +484,7 @@ struct HistoryEntry {
 
 #[function_component(UnitConverter)]
 pub fn unit_converter() -> Html {
+    let (i18n, _) = use_translation();
     let category = use_state(|| UnitCategory::Length);
     let input_value = use_state(String::new);
     let result_value = use_state(String::new);
@@ -1262,7 +1349,7 @@ pub fn unit_converter() -> Html {
     html! {
         <div class="unit-converter">
             <div class="section unit-category-section">
-                <h3>{"カテゴリ選択"}</h3>
+                <h3>{i18n.t("unit_converter.category_select")}</h3>
                 <div class="category-grid">
                     { for UnitCategory::all().iter().map(|cat| {
                         let on_click = {
@@ -1270,13 +1357,14 @@ pub fn unit_converter() -> Html {
                             let cat = *cat;
                             Callback::from(move |_| on_category_change.emit(cat))
                         };
+                        let label = i18n.t(cat.translation_key());
                         html! {
                             <button
                                 class={classes!("category-btn", (*category == *cat).then_some("active"))}
                                 onclick={on_click}
                             >
                                 <span class="category-icon">{cat.icon()}</span>
-                                <span class="category-label">{cat.label()}</span>
+                                <span class="category-label">{label}</span>
                             </button>
                         }
                     })}
@@ -1284,13 +1372,13 @@ pub fn unit_converter() -> Html {
             </div>
 
             <div class="section unit-convert-section">
-                <h3>{"単位変換"}</h3>
+                <h3>{i18n.t("unit_converter.convert_section")}</h3>
                 <div class="convert-form">
                     <div class="convert-input-group">
                         <input
                             type="number"
                             class="form-input convert-input"
-                            placeholder="値を入力..."
+                            placeholder={i18n.t("unit_converter.input_placeholder")}
                             value={(*input_value).clone()}
                             oninput={on_input_change}
                             step="any"
@@ -1301,7 +1389,7 @@ pub fn unit_converter() -> Html {
                         <button
                             class="swap-btn"
                             onclick={on_swap_units}
-                            title="単位を入れ替え"
+                            title={i18n.t("unit_converter.swap_tooltip")}
                         >
                             {"⇄"}
                         </button>
@@ -1313,10 +1401,10 @@ pub fn unit_converter() -> Html {
                             if *is_converting {
                                 <span class="processing">
                                     <span class="spinner"></span>
-                                    {"変換中..."}
+                                    {i18n.t("common.converting")}
                                 </span>
                             } else {
-                                {"変換"}
+                                {i18n.t("common.convert")}
                             }
                         </button>
                     </div>
@@ -1325,7 +1413,7 @@ pub fn unit_converter() -> Html {
 
             if !result_value.is_empty() {
                 <div class="section unit-result-section">
-                    <h3>{"結果"}</h3>
+                    <h3>{i18n.t("unit_converter.result_section")}</h3>
                     <div class="result-display">
                         <code class="result-value">{&*result_value}</code>
                         <button
@@ -1345,9 +1433,9 @@ pub fn unit_converter() -> Html {
             if !history.is_empty() {
                 <div class="section unit-history-section">
                     <div class="history-header">
-                        <h3>{"変換履歴"}</h3>
+                        <h3>{i18n.t("unit_converter.history_section")}</h3>
                         <button class="toolbar-btn" onclick={on_clear_history}>
-                            {"クリア"}
+                            {i18n.t("unit_converter.history_clear")}
                         </button>
                     </div>
                     <div class="history-list">

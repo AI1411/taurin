@@ -5,7 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-yew = { version = "0.21", features = ["csr"] }
+yew = { version = "0.22", features = ["csr"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = ["HtmlSelectElement", "DataTransfer", "DragEvent", "console", "DomRect", "Document", "Window", "MouseEvent", "Navigator", "Clipboard"] }
@@ -14,6 +14,7 @@ js-sys = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde-wasm-bindgen = "0.6"
 console_error_panic_hook = "0.1.7"
+i18nrs = { version = "0.1", features = ["yew"] }
 
 [workspace]
 members = ["src-tauri"]

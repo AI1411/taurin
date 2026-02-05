@@ -3,6 +3,7 @@ use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
 use crate::components::json_formatter::JsonFormatter;
 use crate::components::kanban_board::KanbanBoardComponent;
+use crate::components::language_switcher::LanguageSwitcher;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::password_generator::PasswordGenerator;
 use crate::components::pdf_tools::PdfTools;
@@ -11,6 +12,9 @@ use crate::components::scratch_pad::ScratchPad;
 use crate::components::text_diff::TextDiffComponent;
 use crate::components::unit_converter::UnitConverter;
 use crate::components::uuid_generator::UuidGenerator;
+use crate::i18n::{EN_TRANSLATIONS, JA_TRANSLATIONS};
+use i18nrs::yew::{I18nProvider, I18nProviderConfig, use_translation};
+use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use yew::prelude::*;
@@ -39,21 +43,21 @@ enum Tab {
 }
 
 impl Tab {
-    fn label(&self) -> &'static str {
+    fn translation_key(&self) -> &'static str {
         match self {
-            Tab::ImageCompressor => "Compress",
-            Tab::ImageEditor => "Edit",
-            Tab::CsvViewer => "CSV",
-            Tab::PdfTools => "PDF",
-            Tab::MarkdownToPdf => "Markdown",
-            Tab::KanbanBoard => "Kanban",
-            Tab::ScratchPad => "Notes",
-            Tab::UuidGenerator => "UUID",
-            Tab::PasswordGenerator => "Password",
-            Tab::UnitConverter => "Unit",
-            Tab::TextDiff => "Diff",
-            Tab::RegexTester => "Regex",
-            Tab::JsonFormatter => "JSON",
+            Tab::ImageCompressor => "app.tabs.compress",
+            Tab::ImageEditor => "app.tabs.edit",
+            Tab::CsvViewer => "app.tabs.csv",
+            Tab::PdfTools => "app.tabs.pdf",
+            Tab::MarkdownToPdf => "app.tabs.markdown",
+            Tab::KanbanBoard => "app.tabs.kanban",
+            Tab::ScratchPad => "app.tabs.notes",
+            Tab::UuidGenerator => "app.tabs.uuid",
+            Tab::PasswordGenerator => "app.tabs.password",
+            Tab::UnitConverter => "app.tabs.unit",
+            Tab::TextDiff => "app.tabs.diff",
+            Tab::RegexTester => "app.tabs.regex",
+            Tab::JsonFormatter => "app.tabs.json",
         }
     }
 
@@ -85,12 +89,12 @@ enum Category {
 }
 
 impl Category {
-    fn label(&self) -> &'static str {
+    fn translation_key(&self) -> &'static str {
         match self {
-            Category::Media => "Media",
-            Category::Documents => "Documents",
-            Category::Generators => "Generators",
-            Category::Productivity => "Productivity",
+            Category::Media => "app.categories.media",
+            Category::Documents => "app.categories.documents",
+            Category::Generators => "app.categories.generators",
+            Category::Productivity => "app.categories.productivity",
         }
     }
 
@@ -211,6 +215,27 @@ fn is_text_file(path: &str) -> bool {
 
 #[function_component(App)]
 pub fn app() -> Html {
+    let translations = HashMap::from([
+        ("en", EN_TRANSLATIONS),
+        ("ja", JA_TRANSLATIONS),
+    ]);
+
+    let config = I18nProviderConfig {
+        translations,
+        default_language: "ja".to_string(),
+        ..Default::default()
+    };
+
+    html! {
+        <I18nProvider ..config>
+            <AppInner />
+        </I18nProvider>
+    }
+}
+
+#[function_component(AppInner)]
+fn app_inner() -> Html {
+    let (i18n, _set_language) = use_translation();
     let active_tab = use_state(|| Tab::ImageCompressor);
     let sidebar_collapsed = use_state(|| false);
     let dropped_image_path = use_state(|| Option::<String>::None);
@@ -390,25 +415,27 @@ pub fn app() -> Html {
                 <nav class="sidebar-nav">
                     { for categories.iter().map(|category| {
                         let tabs = category.tabs();
+                        let category_label = i18n.t(category.translation_key());
                         html! {
                             <div class="nav-group">
                                 if !*sidebar_collapsed {
-                                    <div class="nav-group-label">{category.label()}</div>
+                                    <div class="nav-group-label">{category_label}</div>
                                 }
                                 <div class="nav-items">
                                     { for tabs.iter().map(|tab| {
                                         let is_active = *active_tab == *tab;
                                         let on_click = on_tab_click.clone();
                                         let t = *tab;
+                                        let tab_label = i18n.t(tab.translation_key());
                                         html! {
                                             <button
                                                 class={classes!("nav-item", is_active.then_some("active"))}
                                                 onclick={Callback::from(move |_| on_click.emit(t))}
-                                                title={tab.label()}
+                                                title={tab_label.clone()}
                                             >
                                                 <span class="nav-icon">{render_icon(tab.icon())}</span>
                                                 if !*sidebar_collapsed {
-                                                    <span class="nav-label">{tab.label()}</span>
+                                                    <span class="nav-label">{tab_label}</span>
                                                 }
                                             </button>
                                         }
@@ -418,6 +445,9 @@ pub fn app() -> Html {
                         }
                     })}
                 </nav>
+                <div class="sidebar-footer">
+                    <LanguageSwitcher />
+                </div>
             </aside>
             <main class="main-content">
                 <div class={if *active_tab == Tab::ImageCompressor { "content-panel active" } else { "content-panel" }}>

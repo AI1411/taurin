@@ -1,4 +1,5 @@
 use gloo_timers::callback::Timeout;
+use i18nrs::yew::use_translation;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -94,12 +95,12 @@ pub enum PresetCategory {
 }
 
 impl PresetCategory {
-    fn label(&self) -> &'static str {
+    fn translation_key(&self) -> &'static str {
         match self {
-            PresetCategory::Common => "Common",
-            PresetCategory::Validation => "Validation",
-            PresetCategory::Web => "Web",
-            PresetCategory::DateTime => "Date/Time",
+            PresetCategory::Common => "regex_tester.category_common",
+            PresetCategory::Validation => "regex_tester.category_validation",
+            PresetCategory::Web => "regex_tester.category_web",
+            PresetCategory::DateTime => "regex_tester.category_datetime",
         }
     }
 }
@@ -201,6 +202,7 @@ pub struct Props {}
 
 #[function_component(RegexTester)]
 pub fn regex_tester(_props: &Props) -> Html {
+    let (i18n, _) = use_translation();
     let pattern = use_state(String::new);
     let test_text = use_state(String::new);
     let replacement = use_state(String::new);
@@ -574,14 +576,14 @@ pub fn regex_tester(_props: &Props) -> Html {
     html! {
         <div class="regex-tester-container">
             <div class="section regex-header">
-                <h3>{"// REGEX OPTIONS"}</h3>
+                <h3>{i18n.t("regex_tester.options_title")}</h3>
                 <div class="regex-controls">
                     <div class="pattern-input-group">
                         <span class="pattern-prefix">{"/"}</span>
                         <input
                             type="text"
                             class="pattern-input"
-                            placeholder="Enter regular expression..."
+                            placeholder={i18n.t("regex_tester.pattern_placeholder")}
                             value={(*pattern).clone()}
                             oninput={on_pattern_change}
                         />
@@ -591,28 +593,28 @@ pub fn regex_tester(_props: &Props) -> Html {
                         <button
                             class={classes!("flag-btn", flags.global.then_some("active"))}
                             onclick={toggle_flag("g")}
-                            title="Global - match all occurrences"
+                            title={i18n.t("regex_tester.flags_global")}
                         >
                             {"g"}
                         </button>
                         <button
                             class={classes!("flag-btn", flags.case_insensitive.then_some("active"))}
                             onclick={toggle_flag("i")}
-                            title="Case Insensitive"
+                            title={i18n.t("regex_tester.flags_case_insensitive")}
                         >
                             {"i"}
                         </button>
                         <button
                             class={classes!("flag-btn", flags.multiline.then_some("active"))}
                             onclick={toggle_flag("m")}
-                            title="Multiline - ^ and $ match line boundaries"
+                            title={i18n.t("regex_tester.flags_multiline")}
                         >
                             {"m"}
                         </button>
                         <button
                             class={classes!("flag-btn", flags.dot_all.then_some("active"))}
                             onclick={toggle_flag("s")}
-                            title="Dot All - . matches newlines"
+                            title={i18n.t("regex_tester.flags_dot_all")}
                         >
                             {"s"}
                         </button>
@@ -621,16 +623,16 @@ pub fn regex_tester(_props: &Props) -> Html {
                 <div class="preset-toggle-row">
                     <button class="preset-toggle-btn" onclick={toggle_presets}>
                         if *show_presets {
-                            {"Hide Presets ▲"}
+                            {format!("{} ▲", i18n.t("regex_tester.hide_presets"))}
                         } else {
-                            {"Show Presets ▼"}
+                            {format!("{} ▼", i18n.t("regex_tester.show_presets"))}
                         }
                     </button>
                     <button class="replace-toggle-btn" onclick={toggle_replace}>
                         if *show_replace {
-                            {"Hide Replace ▲"}
+                            {format!("{} ▲", i18n.t("regex_tester.hide_replace"))}
                         } else {
-                            {"Show Replace ▼"}
+                            {format!("{} ▼", i18n.t("regex_tester.show_replace"))}
                         }
                     </button>
                 </div>
@@ -638,7 +640,7 @@ pub fn regex_tester(_props: &Props) -> Html {
 
             if *show_presets {
                 <div class="section presets-section">
-                    <h3>{"// COMMON PATTERNS"}</h3>
+                    <h3>{i18n.t("regex_tester.presets_title")}</h3>
                     <div class="preset-categories">
                         <button
                             class={classes!("category-btn", selected_category.is_none().then_some("active"))}
@@ -647,7 +649,7 @@ pub fn regex_tester(_props: &Props) -> Html {
                                 Callback::from(move |_| on_category_select.emit(None))
                             }
                         >
-                            {"All"}
+                            {i18n.t("regex_tester.category_all")}
                         </button>
                         {
                             [PresetCategory::Common, PresetCategory::Validation, PresetCategory::Web, PresetCategory::DateTime]
@@ -656,12 +658,13 @@ pub fn regex_tester(_props: &Props) -> Html {
                                     let is_active = selected_category.as_ref() == Some(cat);
                                     let cat_clone = cat.clone();
                                     let on_click = on_category_select.clone();
+                                    let label = i18n.t(cat.translation_key());
                                     html! {
                                         <button
                                             class={classes!("category-btn", is_active.then_some("active"))}
                                             onclick={Callback::from(move |_| on_click.emit(Some(cat_clone.clone())))}
                                         >
-                                            {cat.label()}
+                                            {label}
                                         </button>
                                     }
                                 })
@@ -690,20 +693,20 @@ pub fn regex_tester(_props: &Props) -> Html {
             }
 
             <div class="section input-section">
-                <h3>{"// TEST STRING"}</h3>
+                <h3>{i18n.t("regex_tester.test_string_title")}</h3>
                 <textarea
                     class="test-textarea"
-                    placeholder="Enter text to test against the pattern..."
+                    placeholder={i18n.t("regex_tester.test_placeholder")}
                     value={(*test_text).clone()}
                     oninput={on_test_text_change}
                 />
                 <div class="action-buttons">
                     <button class="secondary-btn" onclick={on_clear}>
-                        {"Clear All"}
+                        {i18n.t("common.clear_all")}
                     </button>
                     if result.is_some() {
                         <button class="secondary-btn" onclick={on_export}>
-                            {"Export Results"}
+                            {i18n.t("regex_tester.export_results")}
                         </button>
                     }
                 </div>
@@ -717,31 +720,31 @@ pub fn regex_tester(_props: &Props) -> Html {
 
             if *show_replace {
                 <div class="section replace-section">
-                    <h3>{"// REPLACE"}</h3>
+                    <h3>{i18n.t("regex_tester.replace_title")}</h3>
                     <div class="replace-input-group">
                         <input
                             type="text"
                             class="replace-input"
-                            placeholder="Replacement string (use $1, $2 for groups)..."
+                            placeholder={i18n.t("regex_tester.replace_placeholder")}
                             value={(*replacement).clone()}
                             oninput={on_replacement_change}
                         />
                         <button class="primary-btn" onclick={on_replace}>
-                            {"Replace"}
+                            {i18n.t("common.replace")}
                         </button>
                     </div>
                     if let Some(ref res) = *replace_result {
                         <div class="replace-result">
                             <div class="replace-header">
-                                <span class="replace-count">{format!("{} replacements", res.replacements)}</span>
+                                <span class="replace-count">{format!("{} {}", res.replacements, i18n.t("common.replace"))}</span>
                                 <button
                                     class={classes!("copy-btn", (*copied).then_some("copied"))}
                                     onclick={on_copy_result}
                                 >
                                     if *copied {
-                                        {"Copied!"}
+                                        {i18n.t("common.copied")}
                                     } else {
-                                        {"Copy Result"}
+                                        {i18n.t("regex_tester.copy_result")}
                                     }
                                 </button>
                             </div>
@@ -754,27 +757,27 @@ pub fn regex_tester(_props: &Props) -> Html {
             if *is_testing {
                 <div class="section loading-section">
                     <span class="spinner"></span>
-                    <span>{"Testing..."}</span>
+                    <span>{i18n.t("regex_tester.testing")}</span>
                 </div>
             }
 
             if let Some(ref res) = *result {
                 <div class="section stats-section">
-                    <h3>{"// MATCH STATISTICS"}</h3>
+                    <h3>{i18n.t("regex_tester.stats_title")}</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <span class="stat-value">{res.match_count}</span>
-                            <span class="stat-label">{"Matches"}</span>
+                            <span class="stat-label">{i18n.t("regex_tester.matches")}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-value">{res.matches.iter().map(|m| m.groups.len()).sum::<usize>()}</span>
-                            <span class="stat-label">{"Groups"}</span>
+                            <span class="stat-label">{i18n.t("regex_tester.groups")}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="section result-section">
-                    <h3>{"// HIGHLIGHTED TEXT"}</h3>
+                    <h3>{i18n.t("regex_tester.highlighted_title")}</h3>
                     <div class="highlighted-text">
                         {render_highlighted_text(&test_text, &res.matches)}
                     </div>
@@ -782,7 +785,7 @@ pub fn regex_tester(_props: &Props) -> Html {
 
                 if !res.matches.is_empty() {
                     <div class="section matches-section">
-                        <h3>{"// MATCH DETAILS"}</h3>
+                        <h3>{i18n.t("regex_tester.details_title")}</h3>
                         <div class="matches-list">
                             {
                                 res.matches.iter().enumerate().map(|(i, m)| {
@@ -793,7 +796,7 @@ pub fn regex_tester(_props: &Props) -> Html {
                                                     {format!("#{}", i + 1)}
                                                 </span>
                                                 <span class="match-position">
-                                                    {format!("Position: {}..{}", m.start, m.end)}
+                                                    {format!("{}: {}..{}", i18n.t("regex_tester.position"), m.start, m.end)}
                                                 </span>
                                             </div>
                                             <div class="match-content">
@@ -801,7 +804,7 @@ pub fn regex_tester(_props: &Props) -> Html {
                                             </div>
                                             if !m.groups.is_empty() {
                                                 <div class="match-groups">
-                                                    <span class="groups-label">{"Capture Groups:"}</span>
+                                                    <span class="groups-label">{i18n.t("regex_tester.capture_groups")}</span>
                                                     <div class="groups-list">
                                                         {
                                                             m.groups.iter().map(|g| {

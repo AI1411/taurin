@@ -1,4 +1,5 @@
 use gloo_timers::callback::Timeout;
+use i18nrs::yew::use_translation;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -143,6 +144,7 @@ pub struct Props {
 
 #[function_component(JsonFormatter)]
 pub fn json_formatter(props: &Props) -> Html {
+    let (i18n, _) = use_translation();
     let input = use_state(String::new);
     let output = use_state(String::new);
     let indent_size = use_state(|| 2usize);
@@ -606,7 +608,7 @@ pub fn json_formatter(props: &Props) -> Html {
     html! {
         <div class="json-formatter-container">
             <div class="section json-header">
-                <h3>{"// JSON FORMATTER"}</h3>
+                <h3>{i18n.t("json_formatter.title")}</h3>
                 <div class="json-controls">
                     <div class="view-toggle">
                         <button
@@ -616,7 +618,7 @@ pub fn json_formatter(props: &Props) -> Html {
                                 Callback::from(move |_| on_view_mode_change.emit(ViewMode::Text))
                             }
                         >
-                            {"Text"}
+                            {i18n.t("json_formatter.view_text")}
                         </button>
                         <button
                             class={classes!("view-btn", (*view_mode == ViewMode::Tree).then_some("active"))}
@@ -625,15 +627,15 @@ pub fn json_formatter(props: &Props) -> Html {
                                 Callback::from(move |_| on_view_mode_change.emit(ViewMode::Tree))
                             }
                         >
-                            {"Tree"}
+                            {i18n.t("json_formatter.view_tree")}
                         </button>
                     </div>
                     <div class="indent-selector">
-                        <label>{"Indent:"}</label>
+                        <label>{i18n.t("json_formatter.indent_label")}</label>
                         <select onchange={on_indent_change} value={indent_size.to_string()}>
-                            <option value="2" selected={*indent_size == 2}>{"2 spaces"}</option>
-                            <option value="4" selected={*indent_size == 4}>{"4 spaces"}</option>
-                            <option value="8" selected={*indent_size == 8}>{"Tab (8)"}</option>
+                            <option value="2" selected={*indent_size == 2}>{i18n.t("json_formatter.indent_2")}</option>
+                            <option value="4" selected={*indent_size == 4}>{i18n.t("json_formatter.indent_4")}</option>
+                            <option value="8" selected={*indent_size == 8}>{i18n.t("json_formatter.indent_8")}</option>
                         </select>
                     </div>
                 </div>
@@ -646,7 +648,7 @@ pub fn json_formatter(props: &Props) -> Html {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20 6L9 17l-5-5"/>
                             </svg>
-                            {"Valid JSON"}
+                            {i18n.t("json_formatter.valid_json")}
                         </div>
                     } else {
                         <div class="status-badge invalid">
@@ -655,10 +657,10 @@ pub fn json_formatter(props: &Props) -> Html {
                                 <line x1="15" y1="9" x2="9" y2="15"/>
                                 <line x1="9" y1="9" x2="15" y2="15"/>
                             </svg>
-                            {"Invalid JSON"}
+                            {i18n.t("json_formatter.invalid_json")}
                             if let Some(ref pos) = result.error_position {
                                 <span class="error-position">
-                                    {format!(" (Line {}, Column {})", pos.line, pos.column)}
+                                    {format!(" ({} {}, {} {})", i18n.t("common.lines"), pos.line, "Col", pos.column)}
                                 </span>
                             }
                         </div>
@@ -671,7 +673,7 @@ pub fn json_formatter(props: &Props) -> Html {
                     <input
                         type="text"
                         class="search-input"
-                        placeholder="Search in JSON..."
+                        placeholder={i18n.t("json_formatter.search_placeholder")}
                         value={(*search_query).clone()}
                         oninput={on_search_change}
                         onkeydown={on_search_keydown}
@@ -690,7 +692,7 @@ pub fn json_formatter(props: &Props) -> Html {
                             checked={*search_keys}
                             onchange={toggle_search_keys}
                         />
-                        {"Keys"}
+                        {i18n.t("json_formatter.search_keys")}
                     </label>
                     <label class="checkbox-label">
                         <input
@@ -698,12 +700,12 @@ pub fn json_formatter(props: &Props) -> Html {
                             checked={*search_values}
                             onchange={toggle_search_values}
                         />
-                        {"Values"}
+                        {i18n.t("json_formatter.search_values")}
                     </label>
                 </div>
                 if let Some(ref results) = *search_results {
                     <div class="search-results">
-                        <span class="results-count">{format!("{} matches found", results.total_count)}</span>
+                        <span class="results-count">{format!("{} {}", results.total_count, i18n.t("regex_tester.matches"))}</span>
                         if !results.matches.is_empty() {
                             <div class="matches-list">
                                 { for results.matches.iter().take(20).map(|m| {
@@ -718,7 +720,7 @@ pub fn json_formatter(props: &Props) -> Html {
                                 })}
                                 if results.total_count > 20 {
                                     <div class="more-results">
-                                        {format!("... and {} more", results.total_count - 20)}
+                                        {format!("... +{}", results.total_count - 20)}
                                     </div>
                                 }
                             </div>
@@ -730,14 +732,14 @@ pub fn json_formatter(props: &Props) -> Html {
             <div class="section input-output-section">
                 <div class="panel input-panel">
                     <div class="panel-header">
-                        <h4>{"Input"}</h4>
+                        <h4>{i18n.t("common.input")}</h4>
                         <div class="panel-actions">
-                            <button class="secondary-btn" onclick={on_clear}>{"Clear"}</button>
+                            <button class="secondary-btn" onclick={on_clear}>{i18n.t("common.clear")}</button>
                         </div>
                     </div>
                     <textarea
                         class="json-textarea"
-                        placeholder="Paste your JSON here..."
+                        placeholder={i18n.t("json_formatter.input_placeholder")}
                         value={(*input).clone()}
                         oninput={on_input_change}
                     />
@@ -745,18 +747,18 @@ pub fn json_formatter(props: &Props) -> Html {
 
                 <div class="panel output-panel">
                     <div class="panel-header">
-                        <h4>{"Output"}</h4>
+                        <h4>{i18n.t("common.output")}</h4>
                         <div class="panel-actions">
-                            <button class="primary-btn" onclick={on_format}>{"Format"}</button>
-                            <button class="secondary-btn" onclick={on_minify}>{"Minify"}</button>
+                            <button class="primary-btn" onclick={on_format}>{i18n.t("common.format")}</button>
+                            <button class="secondary-btn" onclick={on_minify}>{i18n.t("common.minify")}</button>
                             <button
                                 class={classes!("secondary-btn", (*copied).then_some("copied"))}
                                 onclick={on_copy}
                             >
                                 if *copied {
-                                    {"Copied!"}
+                                    {i18n.t("common.copied")}
                                 } else {
-                                    {"Copy"}
+                                    {i18n.t("common.copy")}
                                 }
                             </button>
                         </div>
@@ -769,7 +771,7 @@ pub fn json_formatter(props: &Props) -> Html {
                                 {render_tree_node(tree)}
                             } else {
                                 <div class="tree-placeholder">
-                                    {"Enter valid JSON to see the tree view"}
+                                    {i18n.t("json_formatter.tree_placeholder")}
                                 </div>
                             }
                         </div>
@@ -780,7 +782,7 @@ pub fn json_formatter(props: &Props) -> Html {
             if *is_processing {
                 <div class="processing-overlay">
                     <span class="spinner"></span>
-                    <span>{"Processing..."}</span>
+                    <span>{i18n.t("common.processing")}</span>
                 </div>
             }
 
@@ -788,7 +790,7 @@ pub fn json_formatter(props: &Props) -> Html {
                 if !result.valid {
                     if let Some(ref error) = result.error {
                         <div class="section error-section">
-                            <h3>{"// ERROR DETAILS"}</h3>
+                            <h3>{i18n.t("json_formatter.error_details")}</h3>
                             <p class="error-message">{error}</p>
                         </div>
                     }

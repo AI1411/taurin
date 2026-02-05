@@ -1,3 +1,4 @@
+use i18nrs::yew::use_translation;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -81,6 +82,7 @@ struct DisplayPassword {
 
 #[function_component(PasswordGenerator)]
 pub fn password_generator() -> Html {
+    let (i18n, _) = use_translation();
     let mode = use_state(|| GeneratorMode::Password);
     let length = use_state(|| 16u32);
     let include_lowercase = use_state(|| true);
@@ -340,7 +342,7 @@ pub fn password_generator() -> Html {
         <div class="password-generator">
             // Mode Toggle
             <div class="section">
-                <h3>{"生成モード"}</h3>
+                <h3>{i18n.t("password_generator.mode_label")}</h3>
                 <div class="mode-toggle">
                     <button
                         class={classes!("mode-btn", (*mode == GeneratorMode::Password).then_some("active"))}
@@ -349,7 +351,7 @@ pub fn password_generator() -> Html {
                             Callback::from(move |_| on_mode_change.emit(GeneratorMode::Password))
                         }}
                     >
-                        {"パスワード"}
+                        {i18n.t("password_generator.mode_password")}
                     </button>
                     <button
                         class={classes!("mode-btn", (*mode == GeneratorMode::Passphrase).then_some("active"))}
@@ -358,7 +360,7 @@ pub fn password_generator() -> Html {
                             Callback::from(move |_| on_mode_change.emit(GeneratorMode::Passphrase))
                         }}
                     >
-                        {"パスフレーズ"}
+                        {i18n.t("password_generator.mode_passphrase")}
                     </button>
                 </div>
             </div>
@@ -366,11 +368,11 @@ pub fn password_generator() -> Html {
             // Password Options
             if *mode == GeneratorMode::Password {
                 <div class="section password-options-section">
-                    <h3>{"パスワード設定"}</h3>
+                    <h3>{i18n.t("password_generator.password_settings")}</h3>
 
                     <div class="password-options">
                         <div class="form-group">
-                            <label>{"文字数"}</label>
+                            <label>{i18n.t("password_generator.length_label")}</label>
                             <div class="length-slider">
                                 <input
                                     type="range"
@@ -391,7 +393,7 @@ pub fn password_generator() -> Html {
                         </div>
 
                         <div class="form-group">
-                            <label>{"文字種"}</label>
+                            <label>{i18n.t("password_generator.char_types_label")}</label>
                             <div class="char-type-options">
                                 <label class="checkbox-option-inline">
                                     <input
@@ -402,7 +404,7 @@ pub fn password_generator() -> Html {
                                             Callback::from(move |_| include_lowercase.set(!*include_lowercase))
                                         }}
                                     />
-                                    <span>{"小文字 (a-z)"}</span>
+                                    <span>{i18n.t("password_generator.lowercase")}</span>
                                 </label>
                                 <label class="checkbox-option-inline">
                                     <input
@@ -413,7 +415,7 @@ pub fn password_generator() -> Html {
                                             Callback::from(move |_| include_uppercase.set(!*include_uppercase))
                                         }}
                                     />
-                                    <span>{"大文字 (A-Z)"}</span>
+                                    <span>{i18n.t("password_generator.uppercase")}</span>
                                 </label>
                                 <label class="checkbox-option-inline">
                                     <input
@@ -424,7 +426,7 @@ pub fn password_generator() -> Html {
                                             Callback::from(move |_| include_digits.set(!*include_digits))
                                         }}
                                     />
-                                    <span>{"数字 (0-9)"}</span>
+                                    <span>{i18n.t("password_generator.digits")}</span>
                                 </label>
                                 <label class="checkbox-option-inline">
                                     <input
@@ -435,7 +437,7 @@ pub fn password_generator() -> Html {
                                             Callback::from(move |_| include_symbols.set(!*include_symbols))
                                         }}
                                     />
-                                    <span>{"記号 (!@#$...)"}</span>
+                                    <span>{i18n.t("password_generator.symbols")}</span>
                                 </label>
                             </div>
                         </div>
@@ -450,23 +452,23 @@ pub fn password_generator() -> Html {
                                         Callback::from(move |_| exclude_ambiguous.set(!*exclude_ambiguous))
                                     }}
                                 />
-                                <span>{"紛らわしい文字を除外 (0, O, l, 1, I)"}</span>
+                                <span>{i18n.t("password_generator.exclude_ambiguous")}</span>
                             </label>
                         </div>
 
                         <div class="form-group">
-                            <label>{"追加除外文字"}</label>
+                            <label>{i18n.t("password_generator.custom_exclude_label")}</label>
                             <input
                                 type="text"
                                 class="form-input"
-                                placeholder="除外する文字を入力..."
+                                placeholder={i18n.t("password_generator.custom_exclude_placeholder")}
                                 value={(*custom_exclude).clone()}
                                 oninput={on_custom_exclude_change}
                             />
                         </div>
 
                         <div class="form-group">
-                            <label>{"生成個数"}</label>
+                            <label>{i18n.t("password_generator.count_label")}</label>
                             <input
                                 type="number"
                                 class="form-input"
@@ -483,11 +485,11 @@ pub fn password_generator() -> Html {
             // Passphrase Options
             if *mode == GeneratorMode::Passphrase {
                 <div class="section passphrase-options-section">
-                    <h3>{"パスフレーズ設定"}</h3>
+                    <h3>{i18n.t("password_generator.passphrase_settings")}</h3>
 
                     <div class="passphrase-options">
                         <div class="form-group">
-                            <label>{"単語数"}</label>
+                            <label>{i18n.t("password_generator.word_count_label")}</label>
                             <div class="length-slider">
                                 <input
                                     type="range"
@@ -508,13 +510,13 @@ pub fn password_generator() -> Html {
                         </div>
 
                         <div class="form-group">
-                            <label>{"区切り文字"}</label>
+                            <label>{i18n.t("password_generator.separator_label")}</label>
                             <select class="form-select" onchange={on_separator_change}>
-                                <option value="-" selected={*separator == "-"}>{"ハイフン (-)"}</option>
-                                <option value="_" selected={*separator == "_"}>{"アンダースコア (_)"}</option>
-                                <option value="." selected={*separator == "."}>{"ドット (.)"}</option>
-                                <option value=" " selected={*separator == " "}>{"スペース"}</option>
-                                <option value="" selected={separator.is_empty()}>{"なし"}</option>
+                                <option value="-" selected={*separator == "-"}>{i18n.t("password_generator.separator_hyphen")}</option>
+                                <option value="_" selected={*separator == "_"}>{i18n.t("password_generator.separator_underscore")}</option>
+                                <option value="." selected={*separator == "."}>{i18n.t("password_generator.separator_dot")}</option>
+                                <option value=" " selected={*separator == " "}>{i18n.t("password_generator.separator_space")}</option>
+                                <option value="" selected={separator.is_empty()}>{i18n.t("password_generator.separator_none")}</option>
                             </select>
                         </div>
 
@@ -529,7 +531,7 @@ pub fn password_generator() -> Html {
                                             Callback::from(move |_| capitalize.set(!*capitalize))
                                         }}
                                     />
-                                    <span>{"単語の先頭を大文字"}</span>
+                                    <span>{i18n.t("password_generator.capitalize_words")}</span>
                                 </label>
                                 <label class="checkbox-option-inline">
                                     <input
@@ -540,13 +542,13 @@ pub fn password_generator() -> Html {
                                             Callback::from(move |_| include_number.set(!*include_number))
                                         }}
                                     />
-                                    <span>{"数字を追加"}</span>
+                                    <span>{i18n.t("password_generator.include_number")}</span>
                                 </label>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>{"生成個数"}</label>
+                            <label>{i18n.t("password_generator.count_label")}</label>
                             <input
                                 type="number"
                                 class="form-input"
@@ -569,13 +571,13 @@ pub fn password_generator() -> Html {
                 if *is_generating {
                     <span class="processing">
                         <span class="spinner"></span>
-                        {"生成中..."}
+                        {i18n.t("common.generating")}
                     </span>
                 } else {
                     if *mode == GeneratorMode::Password {
-                        {"パスワードを生成"}
+                        {i18n.t("password_generator.generate_password")}
                     } else {
-                        {"パスフレーズを生成"}
+                        {i18n.t("password_generator.generate_passphrase")}
                     }
                 }
             </button>
@@ -584,15 +586,15 @@ pub fn password_generator() -> Html {
             if !generated_passwords.is_empty() {
                 <div class="section password-results-section">
                     <div class="password-results-header">
-                        <h3>{format!("生成結果 ({} 件)", generated_passwords.len())}</h3>
+                        <h3>{format!("{} ({})", i18n.t("password_generator.results_title"), generated_passwords.len())}</h3>
                         <button
                             class={classes!("secondary-btn", "copy-all-btn", (*copy_all_feedback).then_some("copied"))}
                             onclick={on_copy_all}
                         >
                             if *copy_all_feedback {
-                                {"✓ コピー完了"}
+                                {format!("✓ {}", i18n.t("common.copied"))}
                             } else {
-                                {"すべてコピー"}
+                                {i18n.t("common.copy_all")}
                             }
                         </button>
                     </div>
@@ -611,7 +613,7 @@ pub fn password_generator() -> Html {
                                                 {&password.strength_label}
                                             </span>
                                             <span class="entropy-value">
-                                                {format!("エントロピー: {:.1} bits", password.entropy)}
+                                                {format!("Entropy: {:.1} bits", password.entropy)}
                                             </span>
                                         </div>
                                     </div>

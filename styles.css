@@ -5052,3 +5052,278 @@ body {
   font-size: var(--text-xs);
   color: var(--text-tertiary);
 }
+
+/* ===== Unix Time Converter Styles ===== */
+.unix-time-converter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-5);
+}
+
+.unix-time-converter .current-time-section {
+  background: linear-gradient(135deg, var(--bg-elevated), var(--bg-surface));
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.unix-time-converter .current-time-header h3 {
+  margin: 0 0 var(--space-4) 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.unix-time-converter .current-time-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.unix-time-converter .time-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+}
+
+.unix-time-converter .time-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  min-width: 140px;
+}
+
+.unix-time-converter .time-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.unix-time-converter .mini-copy-btn {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  background: var(--bg-overlay);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.unix-time-converter .mini-copy-btn:hover {
+  background: var(--accent-primary-dim);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.unix-time-converter .mini-copy-btn.copied {
+  background: var(--success-dim);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.unix-time-converter .mode-section {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+}
+
+.unix-time-converter .mode-tabs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.unix-time-converter .mode-tab {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.unix-time-converter .mode-tab:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+}
+
+.unix-time-converter .mode-tab.active {
+  background: var(--accent-primary);
+  color: var(--bg-base);
+}
+
+.unix-time-converter .options-section {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.unix-time-converter .options-row {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.unix-time-converter .option-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 150px;
+}
+
+.unix-time-converter .option-group label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.unix-time-converter .option-group select {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-overlay);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.unix-time-converter .option-group select:hover {
+  border-color: var(--border-strong);
+}
+
+.unix-time-converter .option-group select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-primary-dim);
+}
+
+.unix-time-converter .input-section {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.unix-time-converter .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.unix-time-converter .section-header h3 {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.unix-time-converter .input-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.unix-time-converter .input-field {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-overlay);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.unix-time-converter .input-field:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-primary-dim);
+}
+
+.unix-time-converter .input-field::placeholder {
+  color: var(--text-tertiary);
+}
+
+.unix-time-converter .format-hint {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.unix-time-converter .action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.unix-time-converter .error-section {
+  padding: 0;
+}
+
+.unix-time-converter .error-message {
+  padding: var(--space-3) var(--space-4);
+  background: var(--error-dim);
+  border: 1px solid var(--error);
+  border-radius: var(--radius-md);
+  color: var(--error);
+  font-size: var(--text-sm);
+}
+
+.unix-time-converter .result-section {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.unix-time-converter .result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.unix-time-converter .result-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--bg-overlay);
+  border-radius: var(--radius-md);
+}
+
+.unix-time-converter .result-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unix-time-converter .result-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.unix-time-converter .result-value.relative {
+  color: var(--accent-primary);
+}
+
+.unix-time-converter .result-value-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.unix-time-converter .result-value-row .result-value {
+  flex: 1;
+}

@@ -11,6 +11,7 @@ mod regex_tester;
 mod scratch_pad;
 mod text_diff;
 mod unit_converter;
+mod unix_time_converter;
 mod uuid_generator;
 
 use base64_encoder::{
@@ -56,6 +57,10 @@ use unit_converter::{
     convert_area, convert_data_size, convert_length, convert_temperature, convert_time,
     convert_volume, convert_weight, AreaUnit, ConversionResult, DataSizeUnit, LengthUnit,
     TemperatureUnit, TimeUnit, VolumeUnit, WeightUnit,
+};
+use unix_time_converter::{
+    datetime_to_unix, get_current_unix_time, unix_to_datetime, CurrentUnixTimeResult,
+    DateTimeToUnixResult, TimestampUnit, TimezoneOption, UnixToDateTimeResult,
 };
 use uuid_generator::{
     generate_uuids, validate_uuid, UuidFormat, UuidGenerateOptions, UuidGenerateResult,
@@ -435,6 +440,25 @@ fn decode_base64_image_cmd(input: String) -> Base64DecodeImageResult {
     decode_base64_image(&input)
 }
 
+#[tauri::command]
+fn unix_to_datetime_cmd(
+    timestamp: i64,
+    unit: TimestampUnit,
+    timezone: TimezoneOption,
+) -> UnixToDateTimeResult {
+    unix_to_datetime(timestamp, unit, timezone)
+}
+
+#[tauri::command]
+fn datetime_to_unix_cmd(datetime_str: String, timezone: TimezoneOption) -> DateTimeToUnixResult {
+    datetime_to_unix(&datetime_str, timezone)
+}
+
+#[tauri::command]
+fn get_current_unix_time_cmd() -> CurrentUnixTimeResult {
+    get_current_unix_time()
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -508,7 +532,10 @@ pub fn run() {
             encode_base64_cmd,
             decode_base64_cmd,
             encode_image_to_base64_cmd,
-            decode_base64_image_cmd
+            decode_base64_image_cmd,
+            unix_to_datetime_cmd,
+            datetime_to_unix_cmd,
+            get_current_unix_time_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

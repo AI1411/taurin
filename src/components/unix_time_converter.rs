@@ -30,7 +30,6 @@ enum TimezoneOption {
 }
 
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 struct UnixToDatetimeArgs {
     timestamp: i64,
     unit: TimestampUnit,
@@ -38,7 +37,6 @@ struct UnixToDatetimeArgs {
 }
 
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 struct DatetimeToUnixArgs {
     datetime_str: String,
     timezone: TimezoneOption,

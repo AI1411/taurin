@@ -261,6 +261,14 @@ mod tests {
     }
 
     #[test]
+    fn test_datetime_to_unix_date_only() {
+        let result = datetime_to_unix("2026-02-08", TimezoneOption::Utc);
+        println!("Result: {:?}", result);
+        assert!(result.success, "Expected success but got error: {:?}", result.error);
+        assert!(result.unix_seconds > 0);
+    }
+
+    #[test]
     fn test_get_current_unix_time() {
         let result = get_current_unix_time();
         assert!(result.unix_seconds > 0);

@@ -43,7 +43,6 @@ struct DatetimeToUnixArgs {
 }
 
 #[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
 struct UnixToDatetimeResult {
     success: bool,
     datetime: String,
@@ -56,7 +55,6 @@ struct UnixToDatetimeResult {
 }
 
 #[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
 struct DatetimeToUnixResult {
     success: bool,
     unix_seconds: i64,
@@ -65,7 +63,6 @@ struct DatetimeToUnixResult {
 }
 
 #[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
 struct CurrentUnixTimeResult {
     unix_seconds: i64,
     unix_milliseconds: i64,

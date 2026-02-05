@@ -5,6 +5,7 @@ mod kanban;
 mod markdown_to_pdf;
 mod password_generator;
 mod pdf_tools;
+mod regex_tester;
 mod scratch_pad;
 mod text_diff;
 mod unit_converter;
@@ -35,6 +36,7 @@ use pdf_tools::{
     get_pdf_info, merge_pdfs, split_pdf_by_pages, split_pdf_by_range, PdfInfo, PdfMergeResult,
     PdfSplitResult,
 };
+use regex_tester::{replace_regex, test_regex, RegexFlags, RegexResult, ReplaceResult};
 use scratch_pad::{
     create_note, delete_note, export_to_file, load_scratch_pad, set_active_note, update_note, Note,
     ScratchPadData,
@@ -320,6 +322,21 @@ fn compute_diff_cmd(old_text: String, new_text: String, mode: DiffMode) -> DiffR
 }
 
 #[tauri::command]
+fn test_regex_cmd(pattern: String, test_text: String, flags: RegexFlags) -> RegexResult {
+    test_regex(&pattern, &test_text, flags)
+}
+
+#[tauri::command]
+fn replace_regex_cmd(
+    pattern: String,
+    test_text: String,
+    replacement: String,
+    flags: RegexFlags,
+) -> ReplaceResult {
+    replace_regex(&pattern, &test_text, &replacement, flags)
+}
+
+#[tauri::command]
 fn get_text_file_info_cmd(path: String) -> Result<FileInfo, String> {
     get_file_info(&path)
 }
@@ -415,6 +432,8 @@ pub fn run() {
             convert_volume_cmd,
             compute_diff_cmd,
             get_text_file_info_cmd,
+            test_regex_cmd,
+            replace_regex_cmd,
             load_scratch_pad_cmd,
             create_note_cmd,
             update_note_cmd,

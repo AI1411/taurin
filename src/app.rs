@@ -1,4 +1,5 @@
 use crate::components::base64_encoder::Base64Encoder;
+use crate::components::char_counter::CharCounter;
 use crate::components::command_palette::{CommandPalette, ToolItem};
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
@@ -47,6 +48,7 @@ enum Tab {
     JsonFormatter,
     Base64Encoder,
     ShortcutDictionary,
+    CharCounter,
 }
 
 impl Tab {
@@ -68,6 +70,7 @@ impl Tab {
             Tab::JsonFormatter => "app.tabs.json",
             Tab::Base64Encoder => "app.tabs.base64",
             Tab::ShortcutDictionary => "app.tabs.shortcut_dictionary",
+            Tab::CharCounter => "app.tabs.char_counter",
         }
     }
 
@@ -89,6 +92,7 @@ impl Tab {
             Tab::JsonFormatter => "json_formatter",
             Tab::Base64Encoder => "base64_encoder",
             Tab::ShortcutDictionary => "shortcut_dictionary",
+            Tab::CharCounter => "char_counter",
         }
     }
 
@@ -110,6 +114,7 @@ impl Tab {
             "json_formatter" => Some(Tab::JsonFormatter),
             "base64_encoder" => Some(Tab::Base64Encoder),
             "shortcut_dictionary" => Some(Tab::ShortcutDictionary),
+            "char_counter" => Some(Tab::CharCounter),
             _ => None,
         }
     }
@@ -132,6 +137,7 @@ impl Tab {
             Tab::JsonFormatter => "command_palette.desc.json",
             Tab::Base64Encoder => "command_palette.desc.base64",
             Tab::ShortcutDictionary => "command_palette.desc.shortcut_dictionary",
+            Tab::CharCounter => "command_palette.desc.char_counter",
         }
     }
 
@@ -268,6 +274,19 @@ impl Tab {
                 "ショートカット".into(),
                 "キーバインド".into(),
             ],
+            Tab::CharCounter => vec![
+                "char".into(),
+                "character".into(),
+                "count".into(),
+                "counter".into(),
+                "byte".into(),
+                "word".into(),
+                "line".into(),
+                "文字数".into(),
+                "バイト数".into(),
+                "カウント".into(),
+                "カウンター".into(),
+            ],
         }
     }
 
@@ -289,6 +308,7 @@ impl Tab {
             Tab::JsonFormatter => "curlybraces",
             Tab::Base64Encoder => "doc.badge.gearshape",
             Tab::ShortcutDictionary => "keyboard",
+            Tab::CharCounter => "textformat.abc",
         }
     }
 }
@@ -320,6 +340,7 @@ impl Category {
                 Tab::MarkdownToPdf,
                 Tab::TextDiff,
                 Tab::JsonFormatter,
+                Tab::CharCounter,
             ],
             Category::Generators => vec![
                 Tab::UuidGenerator,
@@ -669,6 +690,7 @@ fn app_inner() -> Html {
             Tab::JsonFormatter,
             Tab::Base64Encoder,
             Tab::ShortcutDictionary,
+            Tab::CharCounter,
         ];
         all_tabs
             .iter()
@@ -679,7 +701,8 @@ fn app_inner() -> Html {
                     | Tab::PdfTools
                     | Tab::MarkdownToPdf
                     | Tab::TextDiff
-                    | Tab::JsonFormatter => i18n.t("app.categories.documents"),
+                    | Tab::JsonFormatter
+                    | Tab::CharCounter => i18n.t("app.categories.documents"),
                     Tab::UuidGenerator
                     | Tab::PasswordGenerator
                     | Tab::UnitConverter
@@ -845,6 +868,9 @@ fn app_inner() -> Html {
                 <div class={if *active_tab == Tab::ShortcutDictionary { "content-panel active" } else { "content-panel" }}>
                     <ShortcutDictionary />
                 </div>
+                <div class={if *active_tab == Tab::CharCounter { "content-panel active" } else { "content-panel" }}>
+                    <CharCounter />
+                </div>
             </main>
         </div>
     }
@@ -975,6 +1001,14 @@ fn render_icon(name: &str) -> Html {
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
                 <path d="M14 2v6h6"/>
                 <text x="8" y="17" font-size="8" font-weight="bold" fill="currentColor">{"64"}</text>
+            </svg>
+        },
+        "textformat.abc" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 7V5a2 2 0 012-2h14a2 2 0 012 2v2"/>
+                <path d="M12 3v18"/>
+                <path d="M8 21h8"/>
+                <text x="2" y="15" font-size="7" font-weight="bold" fill="currentColor" stroke="none">{"#"}</text>
             </svg>
         },
         _ => html! {

@@ -64,7 +64,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "json": "JSON",
       "base64": "Base64",
       "unix_time": "Unix Time",
-      "shortcut_dictionary": "Shortcuts"
+      "shortcut_dictionary": "Shortcuts",
+      "char_counter": "Char Count"
     }
   },
   "language_switcher": {
@@ -322,8 +323,30 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "regex": "Test regular expressions",
       "json": "Format, validate, and search JSON",
       "base64": "Encode/decode Base64 text and images",
-      "shortcut_dictionary": "Search keyboard shortcuts for VSCode, IntelliJ, Vim, Terminal"
+      "shortcut_dictionary": "Search keyboard shortcuts for VSCode, IntelliJ, Vim, Terminal",
+      "char_counter": "Count characters, words, lines, bytes in real-time"
     }
+  },
+  "char_counter": {
+    "title": "Character Counter",
+    "placeholder": "Enter or paste text here...",
+    "with_spaces": "With Spaces",
+    "without_spaces": "Without Spaces",
+    "copy_stats": "Copy Stats",
+    "basic_stats": "Basic Statistics",
+    "char_count": "Characters",
+    "char_count_no_spaces": "Characters (no spaces)",
+    "word_count": "Words",
+    "line_count": "Lines",
+    "paragraph_count": "Paragraphs",
+    "byte_count": "Byte Count",
+    "char_types": "Character Types",
+    "alphanumeric": "Alphanumeric",
+    "hiragana": "Hiragana",
+    "katakana": "Katakana",
+    "kanji": "Kanji",
+    "fullwidth": "Fullwidth",
+    "halfwidth": "Halfwidth"
   },
   "shortcut_dictionary": {
     "title": "Shortcut Dictionary",
@@ -445,7 +468,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "json": "JSON",
       "base64": "Base64",
       "unix_time": "Unix時間",
-      "shortcut_dictionary": "ショートカット"
+      "shortcut_dictionary": "ショートカット",
+      "char_counter": "文字数カウント"
     }
   },
   "language_switcher": {
@@ -703,8 +727,30 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "regex": "正規表現のテスト",
       "json": "JSONの整形、検証、検索",
       "base64": "Base64テキスト・画像のエンコード/デコード",
-      "shortcut_dictionary": "VSCode, IntelliJ, Vim, ターミナルのキーボードショートカットを検索"
+      "shortcut_dictionary": "VSCode, IntelliJ, Vim, ターミナルのキーボードショートカットを検索",
+      "char_counter": "文字数、単語数、行数、バイト数をリアルタイムでカウント"
     }
+  },
+  "char_counter": {
+    "title": "文字数カウンター",
+    "placeholder": "ここにテキストを入力または貼り付け...",
+    "with_spaces": "空白を含む",
+    "without_spaces": "空白を除く",
+    "copy_stats": "統計をコピー",
+    "basic_stats": "基本統計",
+    "char_count": "文字数",
+    "char_count_no_spaces": "文字数（空白除く）",
+    "word_count": "単語数",
+    "line_count": "行数",
+    "paragraph_count": "段落数",
+    "byte_count": "バイト数",
+    "char_types": "文字種別",
+    "alphanumeric": "英数字",
+    "hiragana": "ひらがな",
+    "katakana": "カタカナ",
+    "kanji": "漢字",
+    "fullwidth": "全角",
+    "halfwidth": "半角"
   },
   "shortcut_dictionary": {
     "title": "ショートカットキー辞典",

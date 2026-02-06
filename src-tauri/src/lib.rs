@@ -1,4 +1,5 @@
 mod base64_encoder;
+mod char_counter;
 mod csv_viewer;
 mod image_compressor;
 mod image_editor;
@@ -18,6 +19,7 @@ use base64_encoder::{
     decode_base64, decode_base64_image, encode_base64, encode_image_to_base64,
     Base64DecodeImageResult, Base64DecodeResult, Base64EncodeResult, Base64ImageResult,
 };
+use char_counter::{count_chars, CharCountResult};
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
 use image_compressor::{
     compress_image, get_image_info, CompressionOptions, CompressionResult, ImageInfo,
@@ -459,6 +461,11 @@ fn get_current_unix_time_cmd() -> CurrentUnixTimeResult {
     get_current_unix_time()
 }
 
+#[tauri::command]
+fn count_chars_cmd(text: String) -> CharCountResult {
+    count_chars(&text)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -536,7 +543,8 @@ pub fn run() {
             decode_base64_image_cmd,
             unix_to_datetime_cmd,
             datetime_to_unix_cmd,
-            get_current_unix_time_cmd
+            get_current_unix_time_cmd,
+            count_chars_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

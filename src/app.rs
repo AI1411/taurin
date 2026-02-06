@@ -1,5 +1,6 @@
 use crate::components::base64_encoder::Base64Encoder;
 use crate::components::char_counter::CharCounter;
+use crate::components::cheatsheet_viewer::CheatsheetViewer;
 use crate::components::command_palette::{CommandPalette, ToolItem};
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
@@ -49,6 +50,7 @@ enum Tab {
     Base64Encoder,
     ShortcutDictionary,
     CharCounter,
+    CheatsheetViewer,
 }
 
 impl Tab {
@@ -71,6 +73,7 @@ impl Tab {
             Tab::Base64Encoder => "app.tabs.base64",
             Tab::ShortcutDictionary => "app.tabs.shortcut_dictionary",
             Tab::CharCounter => "app.tabs.char_counter",
+            Tab::CheatsheetViewer => "app.tabs.cheatsheet_viewer",
         }
     }
 
@@ -93,6 +96,7 @@ impl Tab {
             Tab::Base64Encoder => "base64_encoder",
             Tab::ShortcutDictionary => "shortcut_dictionary",
             Tab::CharCounter => "char_counter",
+            Tab::CheatsheetViewer => "cheatsheet_viewer",
         }
     }
 
@@ -115,6 +119,7 @@ impl Tab {
             "base64_encoder" => Some(Tab::Base64Encoder),
             "shortcut_dictionary" => Some(Tab::ShortcutDictionary),
             "char_counter" => Some(Tab::CharCounter),
+            "cheatsheet_viewer" => Some(Tab::CheatsheetViewer),
             _ => None,
         }
     }
@@ -138,6 +143,7 @@ impl Tab {
             Tab::Base64Encoder => "command_palette.desc.base64",
             Tab::ShortcutDictionary => "command_palette.desc.shortcut_dictionary",
             Tab::CharCounter => "command_palette.desc.char_counter",
+            Tab::CheatsheetViewer => "command_palette.desc.cheatsheet_viewer",
         }
     }
 
@@ -287,6 +293,21 @@ impl Tab {
                 "カウント".into(),
                 "カウンター".into(),
             ],
+            Tab::CheatsheetViewer => vec![
+                "cheatsheet".into(),
+                "cheat".into(),
+                "reference".into(),
+                "command".into(),
+                "git".into(),
+                "docker".into(),
+                "kubernetes".into(),
+                "k8s".into(),
+                "tmux".into(),
+                "bash".into(),
+                "チートシート".into(),
+                "リファレンス".into(),
+                "コマンド".into(),
+            ],
         }
     }
 
@@ -309,6 +330,7 @@ impl Tab {
             Tab::Base64Encoder => "doc.badge.gearshape",
             Tab::ShortcutDictionary => "keyboard",
             Tab::CharCounter => "textformat.abc",
+            Tab::CheatsheetViewer => "book.closed",
         }
     }
 }
@@ -351,7 +373,12 @@ impl Category {
                 Tab::Base64Encoder,
             ],
             Category::Productivity => {
-                vec![Tab::KanbanBoard, Tab::ScratchPad, Tab::ShortcutDictionary]
+                vec![
+                    Tab::KanbanBoard,
+                    Tab::ScratchPad,
+                    Tab::ShortcutDictionary,
+                    Tab::CheatsheetViewer,
+                ]
             }
         }
     }
@@ -691,6 +718,7 @@ fn app_inner() -> Html {
             Tab::Base64Encoder,
             Tab::ShortcutDictionary,
             Tab::CharCounter,
+            Tab::CheatsheetViewer,
         ];
         all_tabs
             .iter()
@@ -709,9 +737,10 @@ fn app_inner() -> Html {
                     | Tab::UnixTimeConverter
                     | Tab::RegexTester
                     | Tab::Base64Encoder => i18n.t("app.categories.generators"),
-                    Tab::KanbanBoard | Tab::ScratchPad | Tab::ShortcutDictionary => {
-                        i18n.t("app.categories.productivity")
-                    }
+                    Tab::KanbanBoard
+                    | Tab::ScratchPad
+                    | Tab::ShortcutDictionary
+                    | Tab::CheatsheetViewer => i18n.t("app.categories.productivity"),
                 };
                 ToolItem {
                     id: tab.id().to_string(),
@@ -871,6 +900,9 @@ fn app_inner() -> Html {
                 <div class={if *active_tab == Tab::CharCounter { "content-panel active" } else { "content-panel" }}>
                     <CharCounter />
                 </div>
+                <div class={if *active_tab == Tab::CheatsheetViewer { "content-panel active" } else { "content-panel" }}>
+                    <CheatsheetViewer />
+                </div>
             </main>
         </div>
     }
@@ -1001,6 +1033,14 @@ fn render_icon(name: &str) -> Html {
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
                 <path d="M14 2v6h6"/>
                 <text x="8" y="17" font-size="8" font-weight="bold" fill="currentColor">{"64"}</text>
+            </svg>
+        },
+        "book.closed" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                <path d="M4 4.5A2.5 2.5 0 016.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15z"/>
+                <line x1="8" y1="7" x2="16" y2="7"/>
+                <line x1="8" y1="11" x2="14" y2="11"/>
             </svg>
         },
         "textformat.abc" => html! {

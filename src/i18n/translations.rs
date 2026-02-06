@@ -65,7 +65,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "base64": "Base64",
       "unix_time": "Unix Time",
       "shortcut_dictionary": "Shortcuts",
-      "char_counter": "Char Count"
+      "char_counter": "Char Count",
+      "cheatsheet_viewer": "Cheat Sheet"
     }
   },
   "language_switcher": {
@@ -324,7 +325,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "json": "Format, validate, and search JSON",
       "base64": "Encode/decode Base64 text and images",
       "shortcut_dictionary": "Search keyboard shortcuts for VSCode, IntelliJ, Vim, Terminal",
-      "char_counter": "Count characters, words, lines, bytes in real-time"
+      "char_counter": "Count characters, words, lines, bytes in real-time",
+      "cheatsheet_viewer": "Quick reference for Git, Docker, Kubernetes, tmux, Bash commands"
     }
   },
   "char_counter": {
@@ -399,6 +401,42 @@ pub const EN_TRANSLATIONS: &str = r#"{
     "time": "Time",
     "day_of_week": "Day of Week",
     "relative_time": "Relative Time"
+  },
+  "cheatsheet_viewer": {
+    "title": "Cheat Sheet Viewer",
+    "select_tool": "Select Tool",
+    "tool_git": "Git",
+    "tool_docker": "Docker",
+    "tool_kubernetes": "Kubernetes",
+    "tool_tmux": "tmux",
+    "tool_bash": "Bash",
+    "search_placeholder": "Search by command or description...",
+    "results_count": "{count} commands",
+    "col_command": "Command",
+    "col_description": "Description",
+    "col_category": "Category",
+    "no_results": "No matching commands found",
+    "favorite": "Favorite",
+    "cat_all": "All",
+    "cat_basic": "Basic",
+    "cat_branch": "Branch",
+    "cat_remote": "Remote",
+    "cat_advanced": "Advanced",
+    "cat_container": "Container",
+    "cat_image": "Image",
+    "cat_network": "Network",
+    "cat_volume": "Volume",
+    "cat_pod": "Pod",
+    "cat_service": "Service",
+    "cat_deployment": "Deployment",
+    "cat_config": "Config",
+    "cat_session": "Session",
+    "cat_window": "Window",
+    "cat_pane": "Pane",
+    "cat_file_ops": "File Ops",
+    "cat_text_processing": "Text",
+    "cat_process": "Process",
+    "cat_navigation": "Navigation"
   }
 }"#;
 
@@ -469,7 +507,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "base64": "Base64",
       "unix_time": "Unix時間",
       "shortcut_dictionary": "ショートカット",
-      "char_counter": "文字数カウント"
+      "char_counter": "文字数カウント",
+      "cheatsheet_viewer": "チートシート"
     }
   },
   "language_switcher": {
@@ -728,7 +767,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "json": "JSONの整形、検証、検索",
       "base64": "Base64テキスト・画像のエンコード/デコード",
       "shortcut_dictionary": "VSCode, IntelliJ, Vim, ターミナルのキーボードショートカットを検索",
-      "char_counter": "文字数、単語数、行数、バイト数をリアルタイムでカウント"
+      "char_counter": "文字数、単語数、行数、バイト数をリアルタイムでカウント",
+      "cheatsheet_viewer": "Git, Docker, Kubernetes, tmux, Bashコマンドのクイックリファレンス"
     }
   },
   "char_counter": {
@@ -803,5 +843,41 @@ pub const JA_TRANSLATIONS: &str = r#"{
     "time": "時刻",
     "day_of_week": "曜日",
     "relative_time": "相対時間"
+  },
+  "cheatsheet_viewer": {
+    "title": "チートシートビューア",
+    "select_tool": "ツールを選択",
+    "tool_git": "Git",
+    "tool_docker": "Docker",
+    "tool_kubernetes": "Kubernetes",
+    "tool_tmux": "tmux",
+    "tool_bash": "Bash",
+    "search_placeholder": "コマンドまたは説明で検索...",
+    "results_count": "{count}件のコマンド",
+    "col_command": "コマンド",
+    "col_description": "説明",
+    "col_category": "カテゴリ",
+    "no_results": "一致するコマンドが見つかりません",
+    "favorite": "お気に入り",
+    "cat_all": "すべて",
+    "cat_basic": "基本",
+    "cat_branch": "ブランチ",
+    "cat_remote": "リモート",
+    "cat_advanced": "応用",
+    "cat_container": "コンテナ",
+    "cat_image": "イメージ",
+    "cat_network": "ネットワーク",
+    "cat_volume": "ボリューム",
+    "cat_pod": "Pod",
+    "cat_service": "Service",
+    "cat_deployment": "Deployment",
+    "cat_config": "設定",
+    "cat_session": "セッション",
+    "cat_window": "ウィンドウ",
+    "cat_pane": "ペイン",
+    "cat_file_ops": "ファイル操作",
+    "cat_text_processing": "テキスト処理",
+    "cat_process": "プロセス",
+    "cat_navigation": "ナビゲーション"
   }
 }"#;

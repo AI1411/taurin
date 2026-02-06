@@ -8,6 +8,7 @@ use crate::components::image_editor::ImageEditor;
 use crate::components::json_formatter::JsonFormatter;
 use crate::components::kanban_board::KanbanBoardComponent;
 use crate::components::language_switcher::LanguageSwitcher;
+use crate::components::markdown_preview::MarkdownPreview;
 use crate::components::markdown_to_pdf::MarkdownToPdf;
 use crate::components::password_generator::PasswordGenerator;
 use crate::components::pdf_tools::PdfTools;
@@ -51,6 +52,7 @@ enum Tab {
     ShortcutDictionary,
     CharCounter,
     CheatsheetViewer,
+    MarkdownPreview,
 }
 
 impl Tab {
@@ -74,6 +76,7 @@ impl Tab {
             Tab::ShortcutDictionary => "app.tabs.shortcut_dictionary",
             Tab::CharCounter => "app.tabs.char_counter",
             Tab::CheatsheetViewer => "app.tabs.cheatsheet_viewer",
+            Tab::MarkdownPreview => "app.tabs.markdown_preview",
         }
     }
 
@@ -97,6 +100,7 @@ impl Tab {
             Tab::ShortcutDictionary => "shortcut_dictionary",
             Tab::CharCounter => "char_counter",
             Tab::CheatsheetViewer => "cheatsheet_viewer",
+            Tab::MarkdownPreview => "markdown_preview",
         }
     }
 
@@ -120,6 +124,7 @@ impl Tab {
             "shortcut_dictionary" => Some(Tab::ShortcutDictionary),
             "char_counter" => Some(Tab::CharCounter),
             "cheatsheet_viewer" => Some(Tab::CheatsheetViewer),
+            "markdown_preview" => Some(Tab::MarkdownPreview),
             _ => None,
         }
     }
@@ -144,6 +149,7 @@ impl Tab {
             Tab::ShortcutDictionary => "command_palette.desc.shortcut_dictionary",
             Tab::CharCounter => "command_palette.desc.char_counter",
             Tab::CheatsheetViewer => "command_palette.desc.cheatsheet_viewer",
+            Tab::MarkdownPreview => "command_palette.desc.markdown_preview",
         }
     }
 
@@ -308,6 +314,16 @@ impl Tab {
                 "リファレンス".into(),
                 "コマンド".into(),
             ],
+            Tab::MarkdownPreview => vec![
+                "markdown".into(),
+                "md".into(),
+                "preview".into(),
+                "gfm".into(),
+                "mermaid".into(),
+                "table".into(),
+                "プレビュー".into(),
+                "マークダウン".into(),
+            ],
         }
     }
 
@@ -331,6 +347,7 @@ impl Tab {
             Tab::ShortcutDictionary => "keyboard",
             Tab::CharCounter => "textformat.abc",
             Tab::CheatsheetViewer => "book.closed",
+            Tab::MarkdownPreview => "doc.richtext",
         }
     }
 }
@@ -360,6 +377,7 @@ impl Category {
                 Tab::CsvViewer,
                 Tab::PdfTools,
                 Tab::MarkdownToPdf,
+                Tab::MarkdownPreview,
                 Tab::TextDiff,
                 Tab::JsonFormatter,
                 Tab::CharCounter,
@@ -719,6 +737,7 @@ fn app_inner() -> Html {
             Tab::ShortcutDictionary,
             Tab::CharCounter,
             Tab::CheatsheetViewer,
+            Tab::MarkdownPreview,
         ];
         all_tabs
             .iter()
@@ -728,6 +747,7 @@ fn app_inner() -> Html {
                     Tab::CsvViewer
                     | Tab::PdfTools
                     | Tab::MarkdownToPdf
+                    | Tab::MarkdownPreview
                     | Tab::TextDiff
                     | Tab::JsonFormatter
                     | Tab::CharCounter => i18n.t("app.categories.documents"),
@@ -903,6 +923,9 @@ fn app_inner() -> Html {
                 <div class={if *active_tab == Tab::CheatsheetViewer { "content-panel active" } else { "content-panel" }}>
                     <CheatsheetViewer />
                 </div>
+                <div class={if *active_tab == Tab::MarkdownPreview { "content-panel active" } else { "content-panel" }}>
+                    <MarkdownPreview />
+                </div>
             </main>
         </div>
     }
@@ -1033,6 +1056,15 @@ fn render_icon(name: &str) -> Html {
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
                 <path d="M14 2v6h6"/>
                 <text x="8" y="17" font-size="8" font-weight="bold" fill="currentColor">{"64"}</text>
+            </svg>
+        },
+        "doc.richtext" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+                <path d="M14 2v6h6"/>
+                <line x1="8" y1="13" x2="16" y2="13"/>
+                <line x1="8" y1="17" x2="12" y2="17"/>
+                <line x1="8" y1="9" x2="10" y2="9"/>
             </svg>
         },
         "book.closed" => html! {

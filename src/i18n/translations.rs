@@ -66,7 +66,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "unix_time": "Unix Time",
       "shortcut_dictionary": "Shortcuts",
       "char_counter": "Char Count",
-      "cheatsheet_viewer": "Cheat Sheet"
+      "cheatsheet_viewer": "Cheat Sheet",
+      "markdown_preview": "MD Preview"
     }
   },
   "language_switcher": {
@@ -326,8 +327,22 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "base64": "Encode/decode Base64 text and images",
       "shortcut_dictionary": "Search keyboard shortcuts for VSCode, IntelliJ, Vim, Terminal",
       "char_counter": "Count characters, words, lines, bytes in real-time",
-      "cheatsheet_viewer": "Quick reference for Git, Docker, Kubernetes, tmux, Bash commands"
+      "cheatsheet_viewer": "Quick reference for Git, Docker, Kubernetes, tmux, Bash commands",
+      "markdown_preview": "Preview Markdown with GFM support, tables, task lists, and more"
     }
+  },
+  "markdown_preview": {
+    "title": "Markdown Preview",
+    "placeholder": "Enter or paste Markdown here...",
+    "editor_label": "Editor",
+    "preview_label": "Preview",
+    "view_split": "Split",
+    "view_editor": "Editor",
+    "view_preview": "Preview",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
+    "export_html": "Export HTML",
+    "words": "words"
   },
   "char_counter": {
     "title": "Character Counter",
@@ -508,7 +523,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "unix_time": "Unix時間",
       "shortcut_dictionary": "ショートカット",
       "char_counter": "文字数カウント",
-      "cheatsheet_viewer": "チートシート"
+      "cheatsheet_viewer": "チートシート",
+      "markdown_preview": "MDプレビュー"
     }
   },
   "language_switcher": {
@@ -768,8 +784,22 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "base64": "Base64テキスト・画像のエンコード/デコード",
       "shortcut_dictionary": "VSCode, IntelliJ, Vim, ターミナルのキーボードショートカットを検索",
       "char_counter": "文字数、単語数、行数、バイト数をリアルタイムでカウント",
-      "cheatsheet_viewer": "Git, Docker, Kubernetes, tmux, Bashコマンドのクイックリファレンス"
+      "cheatsheet_viewer": "Git, Docker, Kubernetes, tmux, Bashコマンドのクイックリファレンス",
+      "markdown_preview": "GFM対応のMarkdownプレビュー（テーブル、タスクリスト等）"
     }
+  },
+  "markdown_preview": {
+    "title": "Markdownプレビュー",
+    "placeholder": "Markdownを入力または貼り付け...",
+    "editor_label": "エディタ",
+    "preview_label": "プレビュー",
+    "view_split": "分割",
+    "view_editor": "エディタ",
+    "view_preview": "プレビュー",
+    "theme_dark": "ダーク",
+    "theme_light": "ライト",
+    "export_html": "HTMLエクスポート",
+    "words": "単語"
   },
   "char_counter": {
     "title": "文字数カウンター",

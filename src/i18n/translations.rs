@@ -63,7 +63,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "regex": "Regex",
       "json": "JSON",
       "base64": "Base64",
-      "unix_time": "Unix Time"
+      "unix_time": "Unix Time",
+      "clipboard": "Clipboard"
     }
   },
   "language_switcher": {
@@ -298,6 +299,26 @@ pub const EN_TRANSLATIONS: &str = r#"{
     "click_to_change": "Click to change image",
     "original_size": "Original:"
   },
+  "clipboard_history": {
+    "title": "Clipboard History",
+    "settings": "Settings",
+    "max_entries": "Max Entries",
+    "exclude_passwords": "Exclude Passwords",
+    "search_placeholder": "Search clipboard history...",
+    "add_placeholder": "Add new entry...",
+    "add": "Add",
+    "empty": "No clipboard history yet",
+    "pinned": "Pinned",
+    "recent": "Recent",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "copies": "copies",
+    "entries": "entries",
+    "just_now": "Just now",
+    "minutes_ago": "minutes ago",
+    "hours_ago": "hours ago",
+    "days_ago": "days ago"
+  },
   "unix_time_converter": {
     "title": "Unix Time Converter",
     "current_time": "Current Time",
@@ -391,7 +412,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "regex": "正規表現",
       "json": "JSON",
       "base64": "Base64",
-      "unix_time": "Unix時間"
+      "unix_time": "Unix時間",
+      "clipboard": "クリップボード"
     }
   },
   "language_switcher": {
@@ -625,6 +647,26 @@ pub const JA_TRANSLATIONS: &str = r#"{
     "copy_data_url": "Data URLをコピー",
     "click_to_change": "クリックで画像を変更",
     "original_size": "元サイズ:"
+  },
+  "clipboard_history": {
+    "title": "クリップボード履歴",
+    "settings": "設定",
+    "max_entries": "最大保存件数",
+    "exclude_passwords": "パスワードを除外",
+    "search_placeholder": "履歴を検索...",
+    "add_placeholder": "新しいエントリを追加...",
+    "add": "追加",
+    "empty": "履歴がありません",
+    "pinned": "ピン留め",
+    "recent": "最近",
+    "pin": "ピン留め",
+    "unpin": "ピン解除",
+    "copies": "回コピー",
+    "entries": "件",
+    "just_now": "たった今",
+    "minutes_ago": "分前",
+    "hours_ago": "時間前",
+    "days_ago": "日前"
   },
   "unix_time_converter": {
     "title": "Unix時間変換",

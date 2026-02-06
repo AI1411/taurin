@@ -103,7 +103,8 @@ pub fn unix_time_converter() -> Html {
                 move || {
                     let current_time = current_time.clone();
                     spawn_local(async move {
-                        if let Ok(result) = invoke("get_current_unix_time_cmd", JsValue::NULL).await {
+                        if let Ok(result) = invoke("get_current_unix_time_cmd", JsValue::NULL).await
+                        {
                             if let Ok(res) =
                                 serde_wasm_bindgen::from_value::<CurrentUnixTimeResult>(result)
                             {
@@ -122,7 +123,8 @@ pub fn unix_time_converter() -> Html {
                 let current_time = current_time.clone();
                 spawn_local(async move {
                     if let Ok(result) = invoke("get_current_unix_time_cmd", JsValue::NULL).await {
-                        if let Ok(res) = serde_wasm_bindgen::from_value::<CurrentUnixTimeResult>(result)
+                        if let Ok(res) =
+                            serde_wasm_bindgen::from_value::<CurrentUnixTimeResult>(result)
                         {
                             current_time.set(Some(res));
                         }
@@ -228,7 +230,9 @@ pub fn unix_time_converter() -> Html {
 
                             match invoke("unix_to_datetime_cmd", args).await {
                                 Ok(result) => {
-                                    match serde_wasm_bindgen::from_value::<UnixToDatetimeResult>(result) {
+                                    match serde_wasm_bindgen::from_value::<UnixToDatetimeResult>(
+                                        result,
+                                    ) {
                                         Ok(res) => {
                                             if res.success {
                                                 datetime_result.set(Some(res));
@@ -243,7 +247,8 @@ pub fn unix_time_converter() -> Html {
                                     }
                                 }
                                 Err(e) => {
-                                    let err_msg = e.as_string().unwrap_or_else(|| format!("{:?}", e));
+                                    let err_msg =
+                                        e.as_string().unwrap_or_else(|| format!("{:?}", e));
                                     error.set(Some(format!("Invoke error: {}", err_msg)));
                                 }
                             }
@@ -260,7 +265,8 @@ pub fn unix_time_converter() -> Html {
 
                         match invoke("datetime_to_unix_cmd", args).await {
                             Ok(result) => {
-                                match serde_wasm_bindgen::from_value::<DatetimeToUnixResult>(result) {
+                                match serde_wasm_bindgen::from_value::<DatetimeToUnixResult>(result)
+                                {
                                     Ok(res) => {
                                         if res.success {
                                             unix_result.set(Some(res));

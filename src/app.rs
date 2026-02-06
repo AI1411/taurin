@@ -1,4 +1,5 @@
 use crate::components::base64_encoder::Base64Encoder;
+use crate::components::command_palette::{CommandPalette, ToolItem};
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
@@ -64,6 +65,87 @@ impl Tab {
             Tab::RegexTester => "app.tabs.regex",
             Tab::JsonFormatter => "app.tabs.json",
             Tab::Base64Encoder => "app.tabs.base64",
+        }
+    }
+
+    fn id(&self) -> &'static str {
+        match self {
+            Tab::ImageCompressor => "image_compressor",
+            Tab::ImageEditor => "image_editor",
+            Tab::CsvViewer => "csv_viewer",
+            Tab::PdfTools => "pdf_tools",
+            Tab::MarkdownToPdf => "markdown_to_pdf",
+            Tab::KanbanBoard => "kanban_board",
+            Tab::ScratchPad => "scratch_pad",
+            Tab::UuidGenerator => "uuid_generator",
+            Tab::PasswordGenerator => "password_generator",
+            Tab::UnitConverter => "unit_converter",
+            Tab::UnixTimeConverter => "unix_time_converter",
+            Tab::TextDiff => "text_diff",
+            Tab::RegexTester => "regex_tester",
+            Tab::JsonFormatter => "json_formatter",
+            Tab::Base64Encoder => "base64_encoder",
+        }
+    }
+
+    fn from_id(id: &str) -> Option<Tab> {
+        match id {
+            "image_compressor" => Some(Tab::ImageCompressor),
+            "image_editor" => Some(Tab::ImageEditor),
+            "csv_viewer" => Some(Tab::CsvViewer),
+            "pdf_tools" => Some(Tab::PdfTools),
+            "markdown_to_pdf" => Some(Tab::MarkdownToPdf),
+            "kanban_board" => Some(Tab::KanbanBoard),
+            "scratch_pad" => Some(Tab::ScratchPad),
+            "uuid_generator" => Some(Tab::UuidGenerator),
+            "password_generator" => Some(Tab::PasswordGenerator),
+            "unit_converter" => Some(Tab::UnitConverter),
+            "unix_time_converter" => Some(Tab::UnixTimeConverter),
+            "text_diff" => Some(Tab::TextDiff),
+            "regex_tester" => Some(Tab::RegexTester),
+            "json_formatter" => Some(Tab::JsonFormatter),
+            "base64_encoder" => Some(Tab::Base64Encoder),
+            _ => None,
+        }
+    }
+
+    fn description_key(&self) -> &'static str {
+        match self {
+            Tab::ImageCompressor => "command_palette.desc.compress",
+            Tab::ImageEditor => "command_palette.desc.edit",
+            Tab::CsvViewer => "command_palette.desc.csv",
+            Tab::PdfTools => "command_palette.desc.pdf",
+            Tab::MarkdownToPdf => "command_palette.desc.markdown",
+            Tab::KanbanBoard => "command_palette.desc.kanban",
+            Tab::ScratchPad => "command_palette.desc.notes",
+            Tab::UuidGenerator => "command_palette.desc.uuid",
+            Tab::PasswordGenerator => "command_palette.desc.password",
+            Tab::UnitConverter => "command_palette.desc.unit",
+            Tab::UnixTimeConverter => "command_palette.desc.unix_time",
+            Tab::TextDiff => "command_palette.desc.diff",
+            Tab::RegexTester => "command_palette.desc.regex",
+            Tab::JsonFormatter => "command_palette.desc.json",
+            Tab::Base64Encoder => "command_palette.desc.base64",
+        }
+    }
+
+    fn keywords(&self) -> Vec<String> {
+        match self {
+            Tab::ImageCompressor => vec!["image".into(), "compress".into(), "png".into(), "jpeg".into(), "webp".into(), "avif".into(), "画像".into(), "圧縮".into()],
+            Tab::ImageEditor => vec!["image".into(), "edit".into(), "resize".into(), "crop".into(), "rotate".into(), "filter".into(), "画像".into(), "編集".into(), "リサイズ".into()],
+            Tab::CsvViewer => vec!["csv".into(), "tsv".into(), "table".into(), "spreadsheet".into(), "テーブル".into()],
+            Tab::PdfTools => vec!["pdf".into(), "split".into(), "merge".into(), "分割".into(), "結合".into()],
+            Tab::MarkdownToPdf => vec!["markdown".into(), "md".into(), "pdf".into(), "convert".into(), "変換".into()],
+            Tab::KanbanBoard => vec!["kanban".into(), "task".into(), "board".into(), "タスク".into(), "ボード".into()],
+            Tab::ScratchPad => vec!["note".into(), "memo".into(), "scratch".into(), "メモ".into(), "ノート".into()],
+            Tab::UuidGenerator => vec!["uuid".into(), "guid".into(), "generate".into(), "v4".into(), "v7".into(), "生成".into()],
+            Tab::PasswordGenerator => vec!["password".into(), "passphrase".into(), "generate".into(), "security".into(), "パスワード".into(), "生成".into()],
+            Tab::UnitConverter => vec!["unit".into(), "convert".into(), "length".into(), "weight".into(), "temperature".into(), "単位".into(), "変換".into()],
+            Tab::UnixTimeConverter => vec!["unix".into(), "time".into(), "timestamp".into(), "epoch".into(), "datetime".into(), "時間".into()],
+            Tab::TextDiff => vec!["diff".into(), "compare".into(), "text".into(), "差分".into(), "比較".into()],
+            Tab::RegexTester => vec!["regex".into(), "regular".into(), "expression".into(), "pattern".into(), "test".into(), "正規表現".into()],
+            Tab::JsonFormatter => vec!["json".into(), "format".into(), "validate".into(), "tree".into(), "整形".into(), "フォーマット".into()],
+            Tab::Base64Encoder => vec!["base64".into(), "encode".into(), "decode".into(), "エンコード".into(), "デコード".into()],
         }
     }
 
@@ -247,6 +329,7 @@ fn app_inner() -> Html {
     let (i18n, _set_language) = use_translation();
     let active_tab = use_state(|| Tab::ImageCompressor);
     let sidebar_collapsed = use_state(|| false);
+    let command_palette_visible = use_state(|| false);
     let dropped_image_path = use_state(|| Option::<String>::None);
     let dropped_editor_path = use_state(|| Option::<String>::None);
     let dropped_csv_path = use_state(|| Option::<String>::None);
@@ -330,6 +413,27 @@ fn app_inner() -> Html {
         });
     }
 
+    // Set up Cmd+K / Ctrl+K keyboard shortcut for command palette
+    {
+        let command_palette_visible = command_palette_visible.clone();
+        use_effect_with((), move |_| {
+            let command_palette_visible = command_palette_visible.clone();
+            let closure = Closure::<dyn Fn(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
+                if (e.meta_key() || e.ctrl_key()) && e.key() == "k" {
+                    e.prevent_default();
+                    command_palette_visible.set(!*command_palette_visible);
+                }
+            });
+            let window = web_sys::window().unwrap();
+            let _ = window.add_event_listener_with_callback(
+                "keydown",
+                closure.as_ref().unchecked_ref(),
+            );
+            closure.forget();
+            || {}
+        });
+    }
+
     let on_tab_click = {
         let active_tab = active_tab.clone();
         Callback::from(move |tab: Tab| {
@@ -407,6 +511,70 @@ fn app_inner() -> Html {
         Category::Productivity,
     ];
 
+    let on_palette_close = {
+        let command_palette_visible = command_palette_visible.clone();
+        Callback::from(move |_| {
+            command_palette_visible.set(false);
+        })
+    };
+
+    let on_palette_select = {
+        let active_tab = active_tab.clone();
+        let command_palette_visible = command_palette_visible.clone();
+        Callback::from(move |id: String| {
+            if let Some(tab) = Tab::from_id(&id) {
+                active_tab.set(tab);
+            }
+            command_palette_visible.set(false);
+        })
+    };
+
+    let tool_items: Vec<ToolItem> = {
+        let all_tabs = vec![
+            Tab::ImageCompressor,
+            Tab::ImageEditor,
+            Tab::CsvViewer,
+            Tab::PdfTools,
+            Tab::MarkdownToPdf,
+            Tab::KanbanBoard,
+            Tab::ScratchPad,
+            Tab::UuidGenerator,
+            Tab::PasswordGenerator,
+            Tab::UnitConverter,
+            Tab::UnixTimeConverter,
+            Tab::TextDiff,
+            Tab::RegexTester,
+            Tab::JsonFormatter,
+            Tab::Base64Encoder,
+        ];
+        all_tabs
+            .iter()
+            .map(|tab| {
+                let category_name = match tab {
+                    Tab::ImageCompressor | Tab::ImageEditor => i18n.t("app.categories.media"),
+                    Tab::CsvViewer | Tab::PdfTools | Tab::MarkdownToPdf | Tab::TextDiff | Tab::JsonFormatter => {
+                        i18n.t("app.categories.documents")
+                    }
+                    Tab::UuidGenerator
+                    | Tab::PasswordGenerator
+                    | Tab::UnitConverter
+                    | Tab::UnixTimeConverter
+                    | Tab::RegexTester
+                    | Tab::Base64Encoder => i18n.t("app.categories.generators"),
+                    Tab::KanbanBoard | Tab::ScratchPad => i18n.t("app.categories.productivity"),
+                };
+                ToolItem {
+                    id: tab.id().to_string(),
+                    name: i18n.t(tab.translation_key()).to_string(),
+                    description: i18n.t(tab.description_key()).to_string(),
+                    category: category_name.to_string(),
+                    icon: tab.icon().to_string(),
+                    keywords: tab.keywords(),
+                }
+            })
+            .collect()
+    };
+
     let sidebar_class = if *sidebar_collapsed {
         "sidebar collapsed"
     } else {
@@ -415,6 +583,12 @@ fn app_inner() -> Html {
 
     html! {
         <div class="app-layout">
+            <CommandPalette
+                visible={*command_palette_visible}
+                on_close={on_palette_close}
+                on_select={on_palette_select}
+                tools={tool_items}
+            />
             <aside class={sidebar_class}>
                 <div class="sidebar-header">
                     <h1 class="sidebar-title">

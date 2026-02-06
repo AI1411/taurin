@@ -298,6 +298,31 @@ pub const EN_TRANSLATIONS: &str = r#"{
     "click_to_change": "Click to change image",
     "original_size": "Original:"
   },
+  "command_palette": {
+    "search_placeholder": "Search tools...",
+    "no_results": "No matching tools found",
+    "shortcut_hint": "⌘K",
+    "navigate": "navigate",
+    "select": "select",
+    "close": "close",
+    "desc": {
+      "compress": "Compress images (PNG, JPEG, WebP, AVIF, GIF, BMP)",
+      "edit": "Edit images (resize, crop, rotate, filters)",
+      "csv": "View and edit CSV/TSV files",
+      "pdf": "PDF tools (info, split, merge)",
+      "markdown": "Convert Markdown to PDF",
+      "kanban": "Kanban board for task management",
+      "notes": "Scratch pad with Markdown support",
+      "uuid": "Generate and validate UUIDs",
+      "password": "Generate passwords and passphrases",
+      "unit": "Convert between different units",
+      "unix_time": "Convert Unix timestamps",
+      "diff": "Compare two texts",
+      "regex": "Test regular expressions",
+      "json": "Format, validate, and search JSON",
+      "base64": "Encode/decode Base64 text and images"
+    }
+  },
   "unix_time_converter": {
     "title": "Unix Time Converter",
     "current_time": "Current Time",
@@ -625,6 +650,31 @@ pub const JA_TRANSLATIONS: &str = r#"{
     "copy_data_url": "Data URLをコピー",
     "click_to_change": "クリックで画像を変更",
     "original_size": "元サイズ:"
+  },
+  "command_palette": {
+    "search_placeholder": "ツールを検索...",
+    "no_results": "一致するツールが見つかりません",
+    "shortcut_hint": "⌘K",
+    "navigate": "移動",
+    "select": "選択",
+    "close": "閉じる",
+    "desc": {
+      "compress": "画像を圧縮（PNG, JPEG, WebP, AVIF, GIF, BMP）",
+      "edit": "画像を編集（リサイズ、切り抜き、回転、フィルター）",
+      "csv": "CSV/TSVファイルの表示・編集",
+      "pdf": "PDFツール（情報表示、分割、結合）",
+      "markdown": "MarkdownをPDFに変換",
+      "kanban": "カンバンボードでタスク管理",
+      "notes": "Markdown対応のメモ帳",
+      "uuid": "UUIDの生成と検証",
+      "password": "パスワード・パスフレーズの生成",
+      "unit": "異なる単位間の変換",
+      "unix_time": "Unixタイムスタンプの変換",
+      "diff": "2つのテキストを比較",
+      "regex": "正規表現のテスト",
+      "json": "JSONの整形、検証、検索",
+      "base64": "Base64テキスト・画像のエンコード/デコード"
+    }
   },
   "unix_time_converter": {
     "title": "Unix時間変換",

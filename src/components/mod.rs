@@ -1,5 +1,4 @@
 pub mod base64_encoder;
-pub mod clipboard_history;
 pub mod csv_viewer;
 pub mod image_compressor;
 pub mod image_editor;

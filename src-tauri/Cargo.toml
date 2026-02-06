@@ -36,5 +36,4 @@ regex = "1"
 rand = "0.8"
 similar = "2"
 base64 = "0.22"
-arboard = "3"
 

@@ -63,7 +63,8 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "regex": "Regex",
       "json": "JSON",
       "base64": "Base64",
-      "unix_time": "Unix Time"
+      "unix_time": "Unix Time",
+      "shortcut_dictionary": "Shortcuts"
     }
   },
   "language_switcher": {
@@ -320,8 +321,35 @@ pub const EN_TRANSLATIONS: &str = r#"{
       "diff": "Compare two texts",
       "regex": "Test regular expressions",
       "json": "Format, validate, and search JSON",
-      "base64": "Encode/decode Base64 text and images"
+      "base64": "Encode/decode Base64 text and images",
+      "shortcut_dictionary": "Search keyboard shortcuts for VSCode, IntelliJ, Vim, Terminal"
     }
+  },
+  "shortcut_dictionary": {
+    "title": "Shortcut Dictionary",
+    "select_app": "Select Application",
+    "app_vscode": "VSCode",
+    "app_intellij": "IntelliJ",
+    "app_vim": "Vim",
+    "app_terminal": "Terminal",
+    "os_label": "OS:",
+    "os_mac": "macOS",
+    "os_windows": "Windows",
+    "os_linux": "Linux",
+    "category_all": "All",
+    "category_editing": "Editing",
+    "category_navigation": "Navigation",
+    "category_search": "Search",
+    "category_debug": "Debug",
+    "category_terminal": "Terminal",
+    "category_view": "View",
+    "category_file": "File",
+    "search_placeholder": "Search by action or key...",
+    "results_count": "{count} shortcuts",
+    "col_action": "Action",
+    "col_shortcut": "Shortcut",
+    "col_category": "Category",
+    "no_results": "No matching shortcuts found"
   },
   "unix_time_converter": {
     "title": "Unix Time Converter",
@@ -416,7 +444,8 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "regex": "正規表現",
       "json": "JSON",
       "base64": "Base64",
-      "unix_time": "Unix時間"
+      "unix_time": "Unix時間",
+      "shortcut_dictionary": "ショートカット"
     }
   },
   "language_switcher": {
@@ -673,8 +702,35 @@ pub const JA_TRANSLATIONS: &str = r#"{
       "diff": "2つのテキストを比較",
       "regex": "正規表現のテスト",
       "json": "JSONの整形、検証、検索",
-      "base64": "Base64テキスト・画像のエンコード/デコード"
+      "base64": "Base64テキスト・画像のエンコード/デコード",
+      "shortcut_dictionary": "VSCode, IntelliJ, Vim, ターミナルのキーボードショートカットを検索"
     }
+  },
+  "shortcut_dictionary": {
+    "title": "ショートカットキー辞典",
+    "select_app": "アプリケーションを選択",
+    "app_vscode": "VSCode",
+    "app_intellij": "IntelliJ",
+    "app_vim": "Vim",
+    "app_terminal": "ターミナル",
+    "os_label": "OS:",
+    "os_mac": "macOS",
+    "os_windows": "Windows",
+    "os_linux": "Linux",
+    "category_all": "すべて",
+    "category_editing": "編集",
+    "category_navigation": "ナビゲーション",
+    "category_search": "検索",
+    "category_debug": "デバッグ",
+    "category_terminal": "ターミナル",
+    "category_view": "表示",
+    "category_file": "ファイル",
+    "search_placeholder": "操作名またはキーで検索...",
+    "results_count": "{count}件のショートカット",
+    "col_action": "操作",
+    "col_shortcut": "ショートカット",
+    "col_category": "カテゴリ",
+    "no_results": "一致するショートカットが見つかりません"
   },
   "unix_time_converter": {
     "title": "Unix時間変換",

@@ -11,6 +11,7 @@ use crate::components::password_generator::PasswordGenerator;
 use crate::components::pdf_tools::PdfTools;
 use crate::components::regex_tester::RegexTester;
 use crate::components::scratch_pad::ScratchPad;
+use crate::components::shortcut_dictionary::ShortcutDictionary;
 use crate::components::text_diff::TextDiffComponent;
 use crate::components::unit_converter::UnitConverter;
 use crate::components::unix_time_converter::UnixTimeConverter;
@@ -45,6 +46,7 @@ enum Tab {
     RegexTester,
     JsonFormatter,
     Base64Encoder,
+    ShortcutDictionary,
 }
 
 impl Tab {
@@ -65,6 +67,7 @@ impl Tab {
             Tab::RegexTester => "app.tabs.regex",
             Tab::JsonFormatter => "app.tabs.json",
             Tab::Base64Encoder => "app.tabs.base64",
+            Tab::ShortcutDictionary => "app.tabs.shortcut_dictionary",
         }
     }
 
@@ -85,6 +88,7 @@ impl Tab {
             Tab::RegexTester => "regex_tester",
             Tab::JsonFormatter => "json_formatter",
             Tab::Base64Encoder => "base64_encoder",
+            Tab::ShortcutDictionary => "shortcut_dictionary",
         }
     }
 
@@ -105,6 +109,7 @@ impl Tab {
             "regex_tester" => Some(Tab::RegexTester),
             "json_formatter" => Some(Tab::JsonFormatter),
             "base64_encoder" => Some(Tab::Base64Encoder),
+            "shortcut_dictionary" => Some(Tab::ShortcutDictionary),
             _ => None,
         }
     }
@@ -126,26 +131,143 @@ impl Tab {
             Tab::RegexTester => "command_palette.desc.regex",
             Tab::JsonFormatter => "command_palette.desc.json",
             Tab::Base64Encoder => "command_palette.desc.base64",
+            Tab::ShortcutDictionary => "command_palette.desc.shortcut_dictionary",
         }
     }
 
     fn keywords(&self) -> Vec<String> {
         match self {
-            Tab::ImageCompressor => vec!["image".into(), "compress".into(), "png".into(), "jpeg".into(), "webp".into(), "avif".into(), "画像".into(), "圧縮".into()],
-            Tab::ImageEditor => vec!["image".into(), "edit".into(), "resize".into(), "crop".into(), "rotate".into(), "filter".into(), "画像".into(), "編集".into(), "リサイズ".into()],
-            Tab::CsvViewer => vec!["csv".into(), "tsv".into(), "table".into(), "spreadsheet".into(), "テーブル".into()],
-            Tab::PdfTools => vec!["pdf".into(), "split".into(), "merge".into(), "分割".into(), "結合".into()],
-            Tab::MarkdownToPdf => vec!["markdown".into(), "md".into(), "pdf".into(), "convert".into(), "変換".into()],
-            Tab::KanbanBoard => vec!["kanban".into(), "task".into(), "board".into(), "タスク".into(), "ボード".into()],
-            Tab::ScratchPad => vec!["note".into(), "memo".into(), "scratch".into(), "メモ".into(), "ノート".into()],
-            Tab::UuidGenerator => vec!["uuid".into(), "guid".into(), "generate".into(), "v4".into(), "v7".into(), "生成".into()],
-            Tab::PasswordGenerator => vec!["password".into(), "passphrase".into(), "generate".into(), "security".into(), "パスワード".into(), "生成".into()],
-            Tab::UnitConverter => vec!["unit".into(), "convert".into(), "length".into(), "weight".into(), "temperature".into(), "単位".into(), "変換".into()],
-            Tab::UnixTimeConverter => vec!["unix".into(), "time".into(), "timestamp".into(), "epoch".into(), "datetime".into(), "時間".into()],
-            Tab::TextDiff => vec!["diff".into(), "compare".into(), "text".into(), "差分".into(), "比較".into()],
-            Tab::RegexTester => vec!["regex".into(), "regular".into(), "expression".into(), "pattern".into(), "test".into(), "正規表現".into()],
-            Tab::JsonFormatter => vec!["json".into(), "format".into(), "validate".into(), "tree".into(), "整形".into(), "フォーマット".into()],
-            Tab::Base64Encoder => vec!["base64".into(), "encode".into(), "decode".into(), "エンコード".into(), "デコード".into()],
+            Tab::ImageCompressor => vec![
+                "image".into(),
+                "compress".into(),
+                "png".into(),
+                "jpeg".into(),
+                "webp".into(),
+                "avif".into(),
+                "画像".into(),
+                "圧縮".into(),
+            ],
+            Tab::ImageEditor => vec![
+                "image".into(),
+                "edit".into(),
+                "resize".into(),
+                "crop".into(),
+                "rotate".into(),
+                "filter".into(),
+                "画像".into(),
+                "編集".into(),
+                "リサイズ".into(),
+            ],
+            Tab::CsvViewer => vec![
+                "csv".into(),
+                "tsv".into(),
+                "table".into(),
+                "spreadsheet".into(),
+                "テーブル".into(),
+            ],
+            Tab::PdfTools => vec![
+                "pdf".into(),
+                "split".into(),
+                "merge".into(),
+                "分割".into(),
+                "結合".into(),
+            ],
+            Tab::MarkdownToPdf => vec![
+                "markdown".into(),
+                "md".into(),
+                "pdf".into(),
+                "convert".into(),
+                "変換".into(),
+            ],
+            Tab::KanbanBoard => vec![
+                "kanban".into(),
+                "task".into(),
+                "board".into(),
+                "タスク".into(),
+                "ボード".into(),
+            ],
+            Tab::ScratchPad => vec![
+                "note".into(),
+                "memo".into(),
+                "scratch".into(),
+                "メモ".into(),
+                "ノート".into(),
+            ],
+            Tab::UuidGenerator => vec![
+                "uuid".into(),
+                "guid".into(),
+                "generate".into(),
+                "v4".into(),
+                "v7".into(),
+                "生成".into(),
+            ],
+            Tab::PasswordGenerator => vec![
+                "password".into(),
+                "passphrase".into(),
+                "generate".into(),
+                "security".into(),
+                "パスワード".into(),
+                "生成".into(),
+            ],
+            Tab::UnitConverter => vec![
+                "unit".into(),
+                "convert".into(),
+                "length".into(),
+                "weight".into(),
+                "temperature".into(),
+                "単位".into(),
+                "変換".into(),
+            ],
+            Tab::UnixTimeConverter => vec![
+                "unix".into(),
+                "time".into(),
+                "timestamp".into(),
+                "epoch".into(),
+                "datetime".into(),
+                "時間".into(),
+            ],
+            Tab::TextDiff => vec![
+                "diff".into(),
+                "compare".into(),
+                "text".into(),
+                "差分".into(),
+                "比較".into(),
+            ],
+            Tab::RegexTester => vec![
+                "regex".into(),
+                "regular".into(),
+                "expression".into(),
+                "pattern".into(),
+                "test".into(),
+                "正規表現".into(),
+            ],
+            Tab::JsonFormatter => vec![
+                "json".into(),
+                "format".into(),
+                "validate".into(),
+                "tree".into(),
+                "整形".into(),
+                "フォーマット".into(),
+            ],
+            Tab::Base64Encoder => vec![
+                "base64".into(),
+                "encode".into(),
+                "decode".into(),
+                "エンコード".into(),
+                "デコード".into(),
+            ],
+            Tab::ShortcutDictionary => vec![
+                "shortcut".into(),
+                "keybinding".into(),
+                "keyboard".into(),
+                "hotkey".into(),
+                "vscode".into(),
+                "intellij".into(),
+                "vim".into(),
+                "terminal".into(),
+                "ショートカット".into(),
+                "キーバインド".into(),
+            ],
         }
     }
 
@@ -166,6 +288,7 @@ impl Tab {
             Tab::RegexTester => "asterisk.circle",
             Tab::JsonFormatter => "curlybraces",
             Tab::Base64Encoder => "doc.badge.gearshape",
+            Tab::ShortcutDictionary => "keyboard",
         }
     }
 }
@@ -207,7 +330,7 @@ impl Category {
                 Tab::Base64Encoder,
             ],
             Category::Productivity => {
-                vec![Tab::KanbanBoard, Tab::ScratchPad]
+                vec![Tab::KanbanBoard, Tab::ScratchPad, Tab::ShortcutDictionary]
             }
         }
     }
@@ -418,17 +541,16 @@ fn app_inner() -> Html {
         let command_palette_visible = command_palette_visible.clone();
         use_effect_with((), move |_| {
             let command_palette_visible = command_palette_visible.clone();
-            let closure = Closure::<dyn Fn(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
-                if (e.meta_key() || e.ctrl_key()) && e.key() == "k" {
-                    e.prevent_default();
-                    command_palette_visible.set(!*command_palette_visible);
-                }
-            });
+            let closure =
+                Closure::<dyn Fn(web_sys::KeyboardEvent)>::new(move |e: web_sys::KeyboardEvent| {
+                    if (e.meta_key() || e.ctrl_key()) && e.key() == "k" {
+                        e.prevent_default();
+                        command_palette_visible.set(!*command_palette_visible);
+                    }
+                });
             let window = web_sys::window().unwrap();
-            let _ = window.add_event_listener_with_callback(
-                "keydown",
-                closure.as_ref().unchecked_ref(),
-            );
+            let _ = window
+                .add_event_listener_with_callback("keydown", closure.as_ref().unchecked_ref());
             closure.forget();
             || {}
         });
@@ -546,22 +668,27 @@ fn app_inner() -> Html {
             Tab::RegexTester,
             Tab::JsonFormatter,
             Tab::Base64Encoder,
+            Tab::ShortcutDictionary,
         ];
         all_tabs
             .iter()
             .map(|tab| {
                 let category_name = match tab {
                     Tab::ImageCompressor | Tab::ImageEditor => i18n.t("app.categories.media"),
-                    Tab::CsvViewer | Tab::PdfTools | Tab::MarkdownToPdf | Tab::TextDiff | Tab::JsonFormatter => {
-                        i18n.t("app.categories.documents")
-                    }
+                    Tab::CsvViewer
+                    | Tab::PdfTools
+                    | Tab::MarkdownToPdf
+                    | Tab::TextDiff
+                    | Tab::JsonFormatter => i18n.t("app.categories.documents"),
                     Tab::UuidGenerator
                     | Tab::PasswordGenerator
                     | Tab::UnitConverter
                     | Tab::UnixTimeConverter
                     | Tab::RegexTester
                     | Tab::Base64Encoder => i18n.t("app.categories.generators"),
-                    Tab::KanbanBoard | Tab::ScratchPad => i18n.t("app.categories.productivity"),
+                    Tab::KanbanBoard | Tab::ScratchPad | Tab::ShortcutDictionary => {
+                        i18n.t("app.categories.productivity")
+                    }
                 };
                 ToolItem {
                     id: tab.id().to_string(),
@@ -715,6 +842,9 @@ fn app_inner() -> Html {
                         on_file_processed={on_base64_image_file_processed}
                     />
                 </div>
+                <div class={if *active_tab == Tab::ShortcutDictionary { "content-panel active" } else { "content-panel" }}>
+                    <ShortcutDictionary />
+                </div>
             </main>
         </div>
     }
@@ -824,6 +954,20 @@ fn render_icon(name: &str) -> Html {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M8 3H6a2 2 0 00-2 2v4a2 2 0 01-2 2 2 2 0 012 2v4a2 2 0 002 2h2"/>
                 <path d="M16 3h2a2 2 0 012 2v4a2 2 0 002 2 2 2 0 00-2 2v4a2 2 0 01-2 2h-2"/>
+            </svg>
+        },
+        "keyboard" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <line x1="6" y1="8" x2="6" y2="8"/>
+                <line x1="10" y1="8" x2="10" y2="8"/>
+                <line x1="14" y1="8" x2="14" y2="8"/>
+                <line x1="18" y1="8" x2="18" y2="8"/>
+                <line x1="6" y1="12" x2="6" y2="12"/>
+                <line x1="10" y1="12" x2="10" y2="12"/>
+                <line x1="14" y1="12" x2="14" y2="12"/>
+                <line x1="18" y1="12" x2="18" y2="12"/>
+                <line x1="7" y1="16" x2="17" y2="16"/>
             </svg>
         },
         "doc.badge.gearshape" => html! {

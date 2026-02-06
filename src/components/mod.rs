@@ -11,6 +11,7 @@ pub mod password_generator;
 pub mod pdf_tools;
 pub mod regex_tester;
 pub mod scratch_pad;
+pub mod shortcut_dictionary;
 pub mod text_diff;
 pub mod unit_converter;
 pub mod unix_time_converter;

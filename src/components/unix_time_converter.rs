@@ -69,6 +69,7 @@ struct CurrentUnixTimeResult {
     unix_seconds: i64,
     unix_milliseconds: i64,
     datetime: String,
+    #[allow(dead_code)]
     iso8601: String,
 }
 

@@ -1,5 +1,4 @@
 mod base64_encoder;
-mod clipboard_history;
 mod csv_viewer;
 mod image_compressor;
 mod image_editor;
@@ -18,11 +17,6 @@ mod uuid_generator;
 use base64_encoder::{
     decode_base64, decode_base64_image, encode_base64, encode_image_to_base64,
     Base64DecodeImageResult, Base64DecodeResult, Base64EncodeResult, Base64ImageResult,
-};
-use clipboard_history::{
-    add_clipboard_entry, clear_clipboard_history, copy_entry_to_clipboard, delete_clipboard_entry,
-    load_clipboard_history, search_clipboard_history, toggle_pinned, update_clipboard_settings,
-    ClipboardEntry, ClipboardHistoryData, ClipboardSettings,
 };
 use csv_viewer::{get_csv_info, read_csv, save_csv, CsvData, CsvInfo};
 use image_compressor::{
@@ -465,97 +459,14 @@ fn get_current_unix_time_cmd() -> CurrentUnixTimeResult {
     get_current_unix_time()
 }
 
-#[tauri::command]
-fn load_clipboard_history_cmd(app: tauri::AppHandle) -> Result<ClipboardHistoryData, String> {
-    load_clipboard_history(&app)
-}
-
-#[tauri::command]
-fn add_clipboard_entry_cmd(
-    app: tauri::AppHandle,
-    content: String,
-) -> Result<ClipboardEntry, String> {
-    add_clipboard_entry(&app, content)
-}
-
-#[tauri::command]
-fn delete_clipboard_entry_cmd(
-    app: tauri::AppHandle,
-    entry_id: String,
-) -> Result<ClipboardHistoryData, String> {
-    delete_clipboard_entry(&app, entry_id)
-}
-
-#[tauri::command]
-fn clear_clipboard_history_cmd(app: tauri::AppHandle) -> Result<ClipboardHistoryData, String> {
-    clear_clipboard_history(&app)
-}
-
-#[tauri::command]
-fn toggle_clipboard_pinned_cmd(
-    app: tauri::AppHandle,
-    entry_id: String,
-) -> Result<ClipboardEntry, String> {
-    toggle_pinned(&app, entry_id)
-}
-
-#[tauri::command]
-fn search_clipboard_history_cmd(
-    app: tauri::AppHandle,
-    query: String,
-) -> Result<Vec<ClipboardEntry>, String> {
-    search_clipboard_history(&app, query)
-}
-
-#[tauri::command]
-fn update_clipboard_settings_cmd(
-    app: tauri::AppHandle,
-    settings: ClipboardSettings,
-) -> Result<ClipboardHistoryData, String> {
-    update_clipboard_settings(&app, settings)
-}
-
-#[tauri::command]
-fn copy_clipboard_entry_cmd(
-    app: tauri::AppHandle,
-    entry_id: String,
-) -> Result<ClipboardEntry, String> {
-    copy_entry_to_clipboard(&app, entry_id)
-}
-
 use tauri::{Emitter, WindowEvent};
-
-fn start_clipboard_monitor(app_handle: tauri::AppHandle) {
-    std::thread::spawn(move || {
-        let mut clipboard = match arboard::Clipboard::new() {
-            Ok(c) => c,
-            Err(_) => return,
-        };
-
-        // Initialize with current clipboard content to avoid adding existing content on startup
-        let mut last_content = clipboard.get_text().unwrap_or_default();
-
-        loop {
-            std::thread::sleep(std::time::Duration::from_millis(1000));
-            if let Ok(content) = clipboard.get_text() {
-                if content != last_content && !content.trim().is_empty() {
-                    last_content = content.clone();
-                    if add_clipboard_entry(&app_handle, content).is_ok() {
-                        let _ = app_handle.emit("clipboard-changed", ());
-                    }
-                }
-            }
-        }
-    });
-}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .setup(|app| {
-            start_clipboard_monitor(app.handle().clone());
+        .setup(|_app| {
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -627,15 +538,7 @@ pub fn run() {
             decode_base64_image_cmd,
             unix_to_datetime_cmd,
             datetime_to_unix_cmd,
-            get_current_unix_time_cmd,
-            load_clipboard_history_cmd,
-            add_clipboard_entry_cmd,
-            delete_clipboard_entry_cmd,
-            clear_clipboard_history_cmd,
-            toggle_clipboard_pinned_cmd,
-            search_clipboard_history_cmd,
-            update_clipboard_settings_cmd,
-            copy_clipboard_entry_cmd
+            get_current_unix_time_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

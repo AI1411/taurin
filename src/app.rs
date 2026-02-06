@@ -1,5 +1,4 @@
 use crate::components::base64_encoder::Base64Encoder;
-use crate::components::clipboard_history::ClipboardHistory;
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
@@ -37,7 +36,6 @@ enum Tab {
     MarkdownToPdf,
     KanbanBoard,
     ScratchPad,
-    ClipboardHistory,
     UuidGenerator,
     PasswordGenerator,
     UnitConverter,
@@ -58,7 +56,6 @@ impl Tab {
             Tab::MarkdownToPdf => "app.tabs.markdown",
             Tab::KanbanBoard => "app.tabs.kanban",
             Tab::ScratchPad => "app.tabs.notes",
-            Tab::ClipboardHistory => "app.tabs.clipboard",
             Tab::UuidGenerator => "app.tabs.uuid",
             Tab::PasswordGenerator => "app.tabs.password",
             Tab::UnitConverter => "app.tabs.unit",
@@ -79,7 +76,6 @@ impl Tab {
             Tab::MarkdownToPdf => "doc.text",
             Tab::KanbanBoard => "rectangle.3.group",
             Tab::ScratchPad => "note.text",
-            Tab::ClipboardHistory => "clipboard",
             Tab::UuidGenerator => "key.fill",
             Tab::PasswordGenerator => "lock.fill",
             Tab::UnitConverter => "arrow.left.arrow.right",
@@ -129,7 +125,7 @@ impl Category {
                 Tab::Base64Encoder,
             ],
             Category::Productivity => {
-                vec![Tab::KanbanBoard, Tab::ScratchPad, Tab::ClipboardHistory]
+                vec![Tab::KanbanBoard, Tab::ScratchPad]
             }
         }
     }
@@ -511,9 +507,6 @@ fn app_inner() -> Html {
                 </div>
                 <div class={if *active_tab == Tab::ScratchPad { "content-panel active" } else { "content-panel" }}>
                     <ScratchPad />
-                </div>
-                <div class={if *active_tab == Tab::ClipboardHistory { "content-panel active" } else { "content-panel" }}>
-                    <ClipboardHistory />
                 </div>
                 <div class={if *active_tab == Tab::UuidGenerator { "content-panel active" } else { "content-panel" }}>
                     <UuidGenerator />

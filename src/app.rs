@@ -1,4 +1,5 @@
 use crate::components::base64_encoder::Base64Encoder;
+use crate::components::clipboard_history::ClipboardHistory;
 use crate::components::csv_viewer::CsvViewer;
 use crate::components::image_compressor::ImageCompressor;
 use crate::components::image_editor::ImageEditor;
@@ -36,6 +37,7 @@ enum Tab {
     MarkdownToPdf,
     KanbanBoard,
     ScratchPad,
+    ClipboardHistory,
     UuidGenerator,
     PasswordGenerator,
     UnitConverter,
@@ -56,6 +58,7 @@ impl Tab {
             Tab::MarkdownToPdf => "app.tabs.markdown",
             Tab::KanbanBoard => "app.tabs.kanban",
             Tab::ScratchPad => "app.tabs.notes",
+            Tab::ClipboardHistory => "app.tabs.clipboard",
             Tab::UuidGenerator => "app.tabs.uuid",
             Tab::PasswordGenerator => "app.tabs.password",
             Tab::UnitConverter => "app.tabs.unit",
@@ -76,6 +79,7 @@ impl Tab {
             Tab::MarkdownToPdf => "doc.text",
             Tab::KanbanBoard => "rectangle.3.group",
             Tab::ScratchPad => "note.text",
+            Tab::ClipboardHistory => "clipboard",
             Tab::UuidGenerator => "key.fill",
             Tab::PasswordGenerator => "lock.fill",
             Tab::UnitConverter => "arrow.left.arrow.right",
@@ -124,7 +128,9 @@ impl Category {
                 Tab::RegexTester,
                 Tab::Base64Encoder,
             ],
-            Category::Productivity => vec![Tab::KanbanBoard, Tab::ScratchPad],
+            Category::Productivity => {
+                vec![Tab::KanbanBoard, Tab::ScratchPad, Tab::ClipboardHistory]
+            }
         }
     }
 }
@@ -506,6 +512,9 @@ fn app_inner() -> Html {
                 <div class={if *active_tab == Tab::ScratchPad { "content-panel active" } else { "content-panel" }}>
                     <ScratchPad />
                 </div>
+                <div class={if *active_tab == Tab::ClipboardHistory { "content-panel active" } else { "content-panel" }}>
+                    <ClipboardHistory />
+                </div>
                 <div class={if *active_tab == Tab::UuidGenerator { "content-panel active" } else { "content-panel" }}>
                     <UuidGenerator />
                 </div>
@@ -628,6 +637,12 @@ fn render_icon(name: &str) -> Html {
                 <path d="M14 2v6h6"/>
                 <line x1="8" y1="13" x2="16" y2="13"/>
                 <line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+        },
+        "clipboard" => html! {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/>
+                <rect x="8" y="2" width="8" height="4" rx="1"/>
             </svg>
         },
         "asterisk.circle" => html! {

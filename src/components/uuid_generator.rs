@@ -18,6 +18,7 @@ pub enum UuidVersion {
 }
 
 impl UuidVersion {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             UuidVersion::V4 => "uuid_generator.version_v4",

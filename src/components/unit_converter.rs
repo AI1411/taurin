@@ -73,6 +73,7 @@ pub enum LengthUnit {
 }
 
 impl LengthUnit {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             LengthUnit::Meter => "unit_converter.length_meter",
@@ -124,6 +125,7 @@ pub enum WeightUnit {
 }
 
 impl WeightUnit {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             WeightUnit::Kilogram => "unit_converter.weight_kilogram",
@@ -173,6 +175,7 @@ pub enum DataSizeUnit {
 }
 
 impl DataSizeUnit {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             DataSizeUnit::Byte => "unit_converter.data_byte",
@@ -227,6 +230,7 @@ pub enum TemperatureUnit {
 }
 
 impl TemperatureUnit {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             TemperatureUnit::Celsius => "unit_converter.temp_celsius",
@@ -264,6 +268,7 @@ pub enum TimeUnit {
 }
 
 impl TimeUnit {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             TimeUnit::Second => "unit_converter.time_second",
@@ -314,6 +319,7 @@ pub enum AreaUnit {
 }
 
 impl AreaUnit {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             AreaUnit::SquareMeter => "unit_converter.area_sqmeter",
@@ -367,6 +373,7 @@ pub enum VolumeUnit {
 }
 
 impl VolumeUnit {
+    #[allow(dead_code)]
     fn translation_key(&self) -> &'static str {
         match self {
             VolumeUnit::Liter => "unit_converter.volume_liter",

@@ -166,36 +166,34 @@ pub fn command_palette(props: &CommandPaletteProps) -> Html {
         let on_close = props.on_close.clone();
         let on_select = props.on_select.clone();
         let filtered_tools = filtered_tools.clone();
-        Callback::from(move |e: KeyboardEvent| {
-            match e.key().as_str() {
-                "ArrowDown" => {
-                    e.prevent_default();
-                    if filtered_len > 0 {
-                        selected_index.set((*selected_index + 1) % filtered_len);
-                    }
+        Callback::from(move |e: KeyboardEvent| match e.key().as_str() {
+            "ArrowDown" => {
+                e.prevent_default();
+                if filtered_len > 0 {
+                    selected_index.set((*selected_index + 1) % filtered_len);
                 }
-                "ArrowUp" => {
-                    e.prevent_default();
-                    if filtered_len > 0 {
-                        selected_index.set(if *selected_index == 0 {
-                            filtered_len - 1
-                        } else {
-                            *selected_index - 1
-                        });
-                    }
-                }
-                "Enter" => {
-                    e.prevent_default();
-                    if let Some(tool) = filtered_tools.get(*selected_index) {
-                        on_select.emit(tool.id.clone());
-                    }
-                }
-                "Escape" => {
-                    e.prevent_default();
-                    on_close.emit(());
-                }
-                _ => {}
             }
+            "ArrowUp" => {
+                e.prevent_default();
+                if filtered_len > 0 {
+                    selected_index.set(if *selected_index == 0 {
+                        filtered_len - 1
+                    } else {
+                        *selected_index - 1
+                    });
+                }
+            }
+            "Enter" => {
+                e.prevent_default();
+                if let Some(tool) = filtered_tools.get(*selected_index) {
+                    on_select.emit(tool.id.clone());
+                }
+            }
+            "Escape" => {
+                e.prevent_default();
+                on_close.emit(());
+            }
+            _ => {}
         })
     };
 

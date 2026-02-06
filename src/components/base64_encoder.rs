@@ -88,9 +88,12 @@ struct ImageEncodeResult {
 #[serde(rename_all = "camelCase")]
 struct ImageDecodeResult {
     success: bool,
+    #[allow(dead_code)]
     mime_type: Option<String>,
+    #[allow(dead_code)]
     size_bytes: usize,
     preview_data_url: Option<String>,
+    #[allow(dead_code)]
     error: Option<String>,
 }
 

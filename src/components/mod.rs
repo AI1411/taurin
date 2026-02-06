@@ -1,5 +1,6 @@
 pub mod base64_encoder;
 pub mod char_counter;
+pub mod cheatsheet_viewer;
 pub mod command_palette;
 pub mod csv_viewer;
 pub mod image_compressor;

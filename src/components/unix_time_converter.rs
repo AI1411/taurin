@@ -5,6 +5,8 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::window;
 use yew::prelude::*;
 
+use crate::components::input_history::{save_history, InputHistoryPanel};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"], catch)]
@@ -92,6 +94,7 @@ pub fn unix_time_converter() -> Html {
 
     // Current time display
     let current_time = use_state(|| Option::<CurrentUnixTimeResult>::None);
+    let history_refresh = use_state(|| 0u32);
 
     // Fetch current time on mount and periodically
     {
@@ -192,6 +195,7 @@ pub fn unix_time_converter() -> Html {
         })
     };
 
+    let history_refresh_for_html = history_refresh.clone();
     let on_convert = {
         let mode = mode.clone();
         let input = input.clone();
@@ -211,6 +215,7 @@ pub fn unix_time_converter() -> Html {
             let error = error.clone();
             let datetime_result = datetime_result.clone();
             let unix_result = unix_result.clone();
+            let history_refresh = history_refresh.clone();
 
             if input_val.trim().is_empty() {
                 return;
@@ -238,6 +243,12 @@ pub fn unix_time_converter() -> Html {
                                             if res.success {
                                                 datetime_result.set(Some(res));
                                                 error.set(None);
+                                                save_history(
+                                                    "unix_time_converter",
+                                                    serde_json::json!({"input": input_val.clone(), "mode": "unix_to_datetime"}),
+                                                    None,
+                                                );
+                                                history_refresh.set(*history_refresh + 1);
                                             } else {
                                                 error.set(res.error);
                                             }
@@ -272,6 +283,12 @@ pub fn unix_time_converter() -> Html {
                                         if res.success {
                                             unix_result.set(Some(res));
                                             error.set(None);
+                                            save_history(
+                                                "unix_time_converter",
+                                                serde_json::json!({"input": input_val.clone(), "mode": "datetime_to_unix"}),
+                                                None,
+                                            );
+                                            history_refresh.set(*history_refresh + 1);
                                         } else {
                                             error.set(res.error);
                                         }
@@ -342,6 +359,23 @@ pub fn unix_time_converter() -> Html {
         })
     };
 
+    let on_history_restore = {
+        let input = input.clone();
+        let mode = mode.clone();
+        Callback::from(move |inputs: serde_json::Value| {
+            if let Some(val) = inputs.get("input").and_then(|v| v.as_str()) {
+                input.set(val.to_string());
+            }
+            if let Some(m) = inputs.get("mode").and_then(|v| v.as_str()) {
+                match m {
+                    "unix_to_datetime" => mode.set(Mode::UnixToDatetime),
+                    "datetime_to_unix" => mode.set(Mode::DatetimeToUnix),
+                    _ => {}
+                }
+            }
+        })
+    };
+
     html! {
         <div class="unix-time-converter">
             // Current time display
@@ -389,6 +423,13 @@ pub fn unix_time_converter() -> Html {
 
             // Mode selector
             <div class="section mode-section">
+                <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: var(--space-2);">
+                    <InputHistoryPanel
+                        tool_id="unix_time_converter"
+                        on_restore={on_history_restore}
+                        refresh_trigger={*history_refresh_for_html}
+                    />
+                </div>
                 <div class="mode-tabs">
                     <button
                         class={classes!("mode-tab", (*mode == Mode::UnixToDatetime).then_some("active"))}

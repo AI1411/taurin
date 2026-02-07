@@ -402,6 +402,20 @@ pub const EN_TRANSLATIONS: &str = r#"{
     "day_of_week": "Day of Week",
     "relative_time": "Relative Time"
   },
+  "input_history": {
+    "title": "History",
+    "toggle": "Toggle History",
+    "search_placeholder": "Search history...",
+    "clear_all": "Clear All",
+    "no_entries": "No history entries",
+    "restore": "Restore",
+    "delete_entry": "Delete",
+    "confirm_clear": "Clear all history for this tool?",
+    "settings": "History Settings",
+    "enabled": "Enable history",
+    "disabled": "History disabled",
+    "max_entries": "Max entries"
+  },
   "cheatsheet_viewer": {
     "title": "Cheat Sheet Viewer",
     "select_tool": "Select Tool",
@@ -843,6 +857,20 @@ pub const JA_TRANSLATIONS: &str = r#"{
     "time": "時刻",
     "day_of_week": "曜日",
     "relative_time": "相対時間"
+  },
+  "input_history": {
+    "title": "履歴",
+    "toggle": "履歴の切替",
+    "search_placeholder": "履歴を検索...",
+    "clear_all": "すべてクリア",
+    "no_entries": "履歴がありません",
+    "restore": "復元",
+    "delete_entry": "削除",
+    "confirm_clear": "このツールの履歴をすべて削除しますか？",
+    "settings": "履歴設定",
+    "enabled": "履歴を有効化",
+    "disabled": "履歴は無効です",
+    "max_entries": "最大件数"
   },
   "cheatsheet_viewer": {
     "title": "チートシートビューア",

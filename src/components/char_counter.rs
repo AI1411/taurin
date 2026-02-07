@@ -5,6 +5,8 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::window;
 use yew::prelude::*;
 
+use crate::components::input_history::{save_history, InputHistoryPanel};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
@@ -46,22 +48,31 @@ pub fn char_counter() -> Html {
     let count_result = use_state(CharCountResult::default);
     let count_mode = use_state(|| CountMode::WithSpaces);
     let copied = use_state(|| false);
+    let history_refresh = use_state(|| 0u32);
 
     let on_input_change = {
         let input = input.clone();
         let count_result = count_result.clone();
+        let history_refresh = history_refresh.clone();
         Callback::from(move |e: InputEvent| {
             let textarea: web_sys::HtmlTextAreaElement = e.target_unchecked_into();
             let value = textarea.value();
             input.set(value.clone());
 
             let count_result = count_result.clone();
+            let history_refresh = history_refresh.clone();
             spawn_local(async move {
-                let args = serde_wasm_bindgen::to_value(&CountCharsArgs { text: value })
-                    .unwrap_or(JsValue::NULL);
+                let args = serde_wasm_bindgen::to_value(&CountCharsArgs {
+                    text: value.clone(),
+                })
+                .unwrap_or(JsValue::NULL);
                 let result = invoke("count_chars_cmd", args).await;
                 if let Ok(res) = serde_wasm_bindgen::from_value::<CharCountResult>(result) {
                     count_result.set(res);
+                    if !value.is_empty() {
+                        save_history("char_counter", serde_json::json!({"input": value}), None);
+                        history_refresh.set(*history_refresh + 1);
+                    }
                 }
             });
         })
@@ -130,6 +141,26 @@ pub fn char_counter() -> Html {
         })
     };
 
+    let on_restore = {
+        let input = input.clone();
+        let count_result = count_result.clone();
+        Callback::from(move |inputs: serde_json::Value| {
+            if let Some(val) = inputs.get("input").and_then(|v| v.as_str()) {
+                let value = val.to_string();
+                input.set(value.clone());
+                let count_result = count_result.clone();
+                spawn_local(async move {
+                    let args = serde_wasm_bindgen::to_value(&CountCharsArgs { text: value })
+                        .unwrap_or(JsValue::NULL);
+                    let result = invoke("count_chars_cmd", args).await;
+                    if let Ok(res) = serde_wasm_bindgen::from_value::<CharCountResult>(result) {
+                        count_result.set(res);
+                    }
+                });
+            }
+        })
+    };
+
     let res = &*count_result;
     let display_char_count = match *count_mode {
         CountMode::WithSpaces => res.char_count,
@@ -152,6 +183,11 @@ pub fn char_counter() -> Html {
                 <div class="char-counter-header">
                     <h3>{i18n.t("char_counter.title")}</h3>
                     <div class="char-counter-actions">
+                        <InputHistoryPanel
+                            tool_id="char_counter"
+                            on_restore={on_restore}
+                            refresh_trigger={*history_refresh}
+                        />
                         <button
                             class={classes!("secondary-btn", (*copied).then_some("copied"))}
                             onclick={on_copy_stats}

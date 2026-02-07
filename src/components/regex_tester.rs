@@ -6,6 +6,8 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::window;
 use yew::prelude::*;
 
+use crate::components::input_history::{save_history, InputHistoryPanel};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
@@ -215,6 +217,7 @@ pub fn regex_tester(_props: &Props) -> Html {
     let selected_category = use_state(|| Option::<PresetCategory>::None);
     let show_presets = use_state(|| false);
     let show_replace = use_state(|| false);
+    let history_refresh = use_state(|| 0u32);
 
     let presets = get_presets();
 
@@ -381,6 +384,7 @@ pub fn regex_tester(_props: &Props) -> Html {
         let flags = flags.clone();
         let replace_result = replace_result.clone();
         let error_message = error_message.clone();
+        let history_refresh = history_refresh.clone();
 
         Callback::from(move |_| {
             let pattern_val = (*pattern).clone();
@@ -389,12 +393,16 @@ pub fn regex_tester(_props: &Props) -> Html {
             let flags_val = *flags;
             let replace_result = replace_result.clone();
             let error_message = error_message.clone();
+            let history_refresh = history_refresh.clone();
 
             if pattern_val.is_empty() {
                 return;
             }
 
             spawn_local(async move {
+                let pattern_save = pattern_val.clone();
+                let test_text_save = test_text_val.clone();
+                let replacement_save = replacement_val.clone();
                 let args = serde_wasm_bindgen::to_value(&ReplaceRegexArgs {
                     pattern: pattern_val,
                     test_text: test_text_val,
@@ -409,6 +417,16 @@ pub fn regex_tester(_props: &Props) -> Html {
                     if result.success {
                         replace_result.set(Some(result));
                         error_message.set(None);
+                        save_history(
+                            "regex_tester",
+                            serde_json::json!({
+                                "pattern": pattern_save,
+                                "test_text": test_text_save,
+                                "replacement": replacement_save
+                            }),
+                            None,
+                        );
+                        history_refresh.set(*history_refresh + 1);
                     } else {
                         error_message.set(result.error);
                     }
@@ -567,6 +585,23 @@ pub fn regex_tester(_props: &Props) -> Html {
         html! { <>{parts}</> }
     };
 
+    let on_history_restore = {
+        let pattern = pattern.clone();
+        let test_text = test_text.clone();
+        let replacement = replacement.clone();
+        Callback::from(move |inputs: serde_json::Value| {
+            if let Some(val) = inputs.get("pattern").and_then(|v| v.as_str()) {
+                pattern.set(val.to_string());
+            }
+            if let Some(val) = inputs.get("test_text").and_then(|v| v.as_str()) {
+                test_text.set(val.to_string());
+            }
+            if let Some(val) = inputs.get("replacement").and_then(|v| v.as_str()) {
+                replacement.set(val.to_string());
+            }
+        })
+    };
+
     let filtered_presets: Vec<&RegexPreset> = if let Some(ref cat) = *selected_category {
         presets.iter().filter(|p| &p.category == cat).collect()
     } else {
@@ -576,7 +611,14 @@ pub fn regex_tester(_props: &Props) -> Html {
     html! {
         <div class="regex-tester-container">
             <div class="section regex-header">
-                <h3>{i18n.t("regex_tester.options_title")}</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="margin: 0;">{i18n.t("regex_tester.options_title")}</h3>
+                    <InputHistoryPanel
+                        tool_id="regex_tester"
+                        on_restore={on_history_restore}
+                        refresh_trigger={*history_refresh}
+                    />
+                </div>
                 <div class="regex-controls">
                     <div class="pattern-input-group">
                         <span class="pattern-prefix">{"/"}</span>

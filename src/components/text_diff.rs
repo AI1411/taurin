@@ -5,6 +5,8 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::window;
 use yew::prelude::*;
 
+use crate::components::input_history::{save_history, InputHistoryPanel};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
@@ -137,6 +139,7 @@ pub fn text_diff(props: &Props) -> Html {
     let view_mode = use_state(|| ViewMode::SideBySide);
     let copied = use_state(|| false);
     let error_message = use_state(|| Option::<String>::None);
+    let history_refresh = use_state(|| 0u32);
 
     // Handle dropped file
     {
@@ -192,6 +195,7 @@ pub fn text_diff(props: &Props) -> Html {
         let is_comparing = is_comparing.clone();
         let diff_mode = diff_mode.clone();
         let error_message = error_message.clone();
+        let history_refresh = history_refresh.clone();
 
         Callback::from(move |_| {
             if (*old_text).is_empty() && (*new_text).is_empty() {
@@ -204,10 +208,13 @@ pub fn text_diff(props: &Props) -> Html {
             let is_comparing = is_comparing.clone();
             let mode = (*diff_mode).clone();
             let error_message = error_message.clone();
+            let history_refresh = history_refresh.clone();
 
             is_comparing.set(true);
 
             spawn_local(async move {
+                let old_save = old_text_val.clone();
+                let new_save = new_text_val.clone();
                 let args = serde_wasm_bindgen::to_value(&ComputeDiffArgs {
                     old_text: old_text_val,
                     new_text: new_text_val,
@@ -221,6 +228,15 @@ pub fn text_diff(props: &Props) -> Html {
                     if res.success {
                         diff_result.set(Some(res));
                         error_message.set(None);
+                        save_history(
+                            "text_diff",
+                            serde_json::json!({
+                                "old_text": old_save,
+                                "new_text": new_save
+                            }),
+                            None,
+                        );
+                        history_refresh.set(*history_refresh + 1);
                     } else {
                         error_message.set(res.error);
                     }
@@ -322,10 +338,30 @@ pub fn text_diff(props: &Props) -> Html {
         })
     };
 
+    let on_history_restore = {
+        let old_text = old_text.clone();
+        let new_text = new_text.clone();
+        Callback::from(move |inputs: serde_json::Value| {
+            if let Some(val) = inputs.get("old_text").and_then(|v| v.as_str()) {
+                old_text.set(val.to_string());
+            }
+            if let Some(val) = inputs.get("new_text").and_then(|v| v.as_str()) {
+                new_text.set(val.to_string());
+            }
+        })
+    };
+
     html! {
         <div class="text-diff-container">
             <div class="section diff-header">
-                <h3>{"// DIFF OPTIONS"}</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="margin: 0;">{"// DIFF OPTIONS"}</h3>
+                    <InputHistoryPanel
+                        tool_id="text_diff"
+                        on_restore={on_history_restore}
+                        refresh_trigger={*history_refresh}
+                    />
+                </div>
                 <div class="diff-controls">
                     <div class="control-group">
                         <label class="control-label">{"Diff Mode"}</label>

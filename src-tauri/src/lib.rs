@@ -3,6 +3,7 @@ mod char_counter;
 mod csv_viewer;
 mod image_compressor;
 mod image_editor;
+mod input_history;
 mod json_formatter;
 mod kanban;
 mod markdown_to_pdf;
@@ -28,6 +29,11 @@ use image_editor::{
     adjust_brightness, adjust_contrast, apply_filter, crop_image, flip_horizontal, flip_vertical,
     get_editor_image_info, resize_image, rotate_image, EditResult, ImageEditorInfo, ImageFilter,
     RotationAngle,
+};
+use input_history::{
+    add_history_entry, clear_tool_history, delete_history_entry, get_tool_history,
+    get_tool_history_settings, search_tool_history, update_tool_history_settings, HistoryEntry,
+    ToolHistorySettings,
 };
 use json_formatter::{
     format_json, minify_json, parse_to_tree, search_json, validate_json, JsonFormatResult,
@@ -466,6 +472,61 @@ fn count_chars_cmd(text: String) -> CharCountResult {
     count_chars(&text)
 }
 
+#[tauri::command]
+fn add_history_entry_cmd(
+    app: tauri::AppHandle,
+    tool_id: String,
+    inputs: serde_json::Value,
+    label: Option<String>,
+) -> Result<HistoryEntry, String> {
+    add_history_entry(&app, tool_id, inputs, label)
+}
+
+#[tauri::command]
+fn get_tool_history_cmd(
+    app: tauri::AppHandle,
+    tool_id: String,
+) -> Result<Vec<HistoryEntry>, String> {
+    get_tool_history(&app, tool_id)
+}
+
+#[tauri::command]
+fn search_tool_history_cmd(
+    app: tauri::AppHandle,
+    tool_id: String,
+    query: String,
+) -> Result<Vec<HistoryEntry>, String> {
+    search_tool_history(&app, tool_id, query)
+}
+
+#[tauri::command]
+fn delete_history_entry_cmd(app: tauri::AppHandle, entry_id: String) -> Result<(), String> {
+    delete_history_entry(&app, entry_id)
+}
+
+#[tauri::command]
+fn clear_tool_history_cmd(app: tauri::AppHandle, tool_id: String) -> Result<(), String> {
+    clear_tool_history(&app, tool_id)
+}
+
+#[tauri::command]
+fn update_tool_history_settings_cmd(
+    app: tauri::AppHandle,
+    tool_id: String,
+    enabled: bool,
+    max_entries: usize,
+) -> Result<ToolHistorySettings, String> {
+    update_tool_history_settings(&app, tool_id, enabled, max_entries)
+}
+
+#[tauri::command]
+fn get_tool_history_settings_cmd(
+    app: tauri::AppHandle,
+    tool_id: String,
+) -> Result<ToolHistorySettings, String> {
+    get_tool_history_settings(&app, tool_id)
+}
+
 use tauri::{Emitter, WindowEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -544,7 +605,14 @@ pub fn run() {
             unix_to_datetime_cmd,
             datetime_to_unix_cmd,
             get_current_unix_time_cmd,
-            count_chars_cmd
+            count_chars_cmd,
+            add_history_entry_cmd,
+            get_tool_history_cmd,
+            search_tool_history_cmd,
+            delete_history_entry_cmd,
+            clear_tool_history_cmd,
+            update_tool_history_settings_cmd,
+            get_tool_history_settings_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

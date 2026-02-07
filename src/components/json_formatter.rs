@@ -6,6 +6,8 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::window;
 use yew::prelude::*;
 
+use crate::components::input_history::{save_history, InputHistoryPanel};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
@@ -158,6 +160,7 @@ pub fn json_formatter(props: &Props) -> Html {
     let is_processing = use_state(|| false);
     let copied = use_state(|| false);
     let collapsed_paths = use_state(|| std::collections::HashSet::<String>::new());
+    let history_refresh = use_state(|| 0u32);
 
     // Handle dropped file
     {
@@ -300,11 +303,13 @@ pub fn json_formatter(props: &Props) -> Html {
         let output = output.clone();
         let indent_size = *indent_size;
         let is_processing = is_processing.clone();
+        let history_refresh = history_refresh.clone();
 
         Callback::from(move |_| {
             let input_val = (*input).clone();
             let output = output.clone();
             let is_processing = is_processing.clone();
+            let history_refresh = history_refresh.clone();
 
             if input_val.is_empty() {
                 return;
@@ -314,7 +319,7 @@ pub fn json_formatter(props: &Props) -> Html {
 
             spawn_local(async move {
                 let args = serde_wasm_bindgen::to_value(&FormatJsonArgs {
-                    input: input_val,
+                    input: input_val.clone(),
                     indent_size,
                 })
                 .unwrap();
@@ -322,6 +327,12 @@ pub fn json_formatter(props: &Props) -> Html {
                 if let Ok(result) = serde_wasm_bindgen::from_value::<JsonFormatResult>(res) {
                     if result.success {
                         output.set(result.formatted);
+                        save_history(
+                            "json_formatter",
+                            serde_json::json!({"input": input_val}),
+                            None,
+                        );
+                        history_refresh.set(*history_refresh + 1);
                     }
                 }
                 is_processing.set(false);
@@ -608,10 +619,26 @@ pub fn json_formatter(props: &Props) -> Html {
         }
     };
 
+    let on_history_restore = {
+        let input = input.clone();
+        Callback::from(move |inputs: serde_json::Value| {
+            if let Some(val) = inputs.get("input").and_then(|v| v.as_str()) {
+                input.set(val.to_string());
+            }
+        })
+    };
+
     html! {
         <div class="json-formatter-container">
             <div class="section json-header">
-                <h3>{i18n.t("json_formatter.title")}</h3>
+                <div class="json-title-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
+                    <h3 style="margin: 0;">{i18n.t("json_formatter.title")}</h3>
+                    <InputHistoryPanel
+                        tool_id="json_formatter"
+                        on_restore={on_history_restore}
+                        refresh_trigger={*history_refresh}
+                    />
+                </div>
                 <div class="json-controls">
                     <div class="view-toggle">
                         <button

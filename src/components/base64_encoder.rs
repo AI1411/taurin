@@ -5,6 +5,8 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::window;
 use yew::prelude::*;
 
+use crate::components::input_history::{save_history, InputHistoryPanel};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
@@ -121,6 +123,7 @@ pub fn base64_encoder(props: &Props) -> Html {
     let image_preview = use_state(|| Option::<String>::None); // data URL after encoding
     let image_info = use_state(|| Option::<(String, usize)>::None); // (mime_type, size)
     let decoded_image_preview = use_state(|| Option::<String>::None);
+    let history_refresh = use_state(|| 0u32);
 
     // Handle dropped file
     {
@@ -213,6 +216,7 @@ pub fn base64_encoder(props: &Props) -> Html {
         })
     };
 
+    let history_refresh_for_html = history_refresh.clone();
     let on_convert = {
         let mode = mode.clone();
         let input = input.clone();
@@ -232,6 +236,7 @@ pub fn base64_encoder(props: &Props) -> Html {
             let error = error.clone();
             let is_binary = is_binary.clone();
             let decoded_image_preview = decoded_image_preview.clone();
+            let history_refresh = history_refresh.clone();
 
             if input_val.trim().is_empty() {
                 return;
@@ -242,6 +247,7 @@ pub fn base64_encoder(props: &Props) -> Html {
             spawn_local(async move {
                 match current_mode {
                     Mode::Encode => {
+                        let input_val_for_history = input_val.clone();
                         let args = serde_wasm_bindgen::to_value(&EncodeArgs {
                             input: input_val,
                             url_safe: url_safe_val,
@@ -253,6 +259,12 @@ pub fn base64_encoder(props: &Props) -> Html {
                             if res.success {
                                 output.set(res.output);
                                 error.set(None);
+                                save_history(
+                                    "base64_encoder",
+                                    serde_json::json!({"input": input_val_for_history, "mode": "encode"}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             } else {
                                 error.set(res.error);
                             }
@@ -277,6 +289,7 @@ pub fn base64_encoder(props: &Props) -> Html {
                         }
 
                         // Also decode as text
+                        let input_val_for_history = input_val.clone();
                         let args = serde_wasm_bindgen::to_value(&DecodeArgs {
                             input: input_val,
                             url_safe: url_safe_val,
@@ -289,6 +302,12 @@ pub fn base64_encoder(props: &Props) -> Html {
                                 output.set(res.output);
                                 is_binary.set(!res.is_valid_utf8);
                                 error.set(None);
+                                save_history(
+                                    "base64_encoder",
+                                    serde_json::json!({"input": input_val_for_history, "mode": "decode"}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             } else {
                                 error.set(res.error);
                             }
@@ -459,10 +478,34 @@ pub fn base64_encoder(props: &Props) -> Html {
         })
     };
 
+    let on_history_restore = {
+        let input = input.clone();
+        let mode = mode.clone();
+        Callback::from(move |inputs: serde_json::Value| {
+            if let Some(val) = inputs.get("input").and_then(|v| v.as_str()) {
+                input.set(val.to_string());
+            }
+            if let Some(m) = inputs.get("mode").and_then(|v| v.as_str()) {
+                match m {
+                    "encode" => mode.set(Mode::Encode),
+                    "decode" => mode.set(Mode::Decode),
+                    _ => {}
+                }
+            }
+        })
+    };
+
     html! {
         <div class="base64-encoder">
             // Mode selector
             <div class="section mode-section">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2);">
+                    <InputHistoryPanel
+                        tool_id="base64_encoder"
+                        on_restore={on_history_restore}
+                        refresh_trigger={*history_refresh_for_html}
+                    />
+                </div>
                 <div class="mode-tabs">
                     <button
                         class={classes!("mode-tab", (*mode == Mode::Encode).then_some("active"))}

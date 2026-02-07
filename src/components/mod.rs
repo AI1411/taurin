@@ -5,6 +5,7 @@ pub mod command_palette;
 pub mod csv_viewer;
 pub mod image_compressor;
 pub mod image_editor;
+pub mod input_history;
 pub mod json_formatter;
 pub mod kanban_board;
 pub mod language_switcher;

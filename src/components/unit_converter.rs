@@ -5,6 +5,8 @@ use wasm_bindgen_futures::spawn_local;
 use web_sys::window;
 use yew::prelude::*;
 
+use crate::components::input_history::{save_history, InputHistoryPanel};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
@@ -498,6 +500,7 @@ pub fn unit_converter() -> Html {
     let is_converting = use_state(|| false);
     let history = use_state(Vec::<HistoryEntry>::new);
     let copied = use_state(|| false);
+    let history_refresh = use_state(|| 0u32);
 
     // Unit states for each category
     let length_from = use_state(|| LengthUnit::Meter);
@@ -605,6 +608,7 @@ pub fn unit_converter() -> Html {
         let result_value = result_value.clone();
         let is_converting = is_converting.clone();
         let history = history.clone();
+        let history_refresh = history_refresh.clone();
         let length_from = length_from.clone();
         let length_to = length_to.clone();
         let weight_from = weight_from.clone();
@@ -640,6 +644,7 @@ pub fn unit_converter() -> Html {
                     let to = (*length_to).clone();
                     let from_label = from.label().to_string();
                     let to_label = to.label().to_string();
+                    let history_refresh = history_refresh.clone();
                     spawn_local(async move {
                         let args =
                             serde_wasm_bindgen::to_value(&ConvertLengthArgs { value, from, to })
@@ -654,16 +659,22 @@ pub fn unit_converter() -> Html {
                                     0,
                                     HistoryEntry {
                                         category: cat,
-                                        from_value: input_str,
-                                        from_unit: from_label,
+                                        from_value: input_str.clone(),
+                                        from_unit: from_label.clone(),
                                         to_value: res.formatted,
-                                        to_unit: to_label,
+                                        to_unit: to_label.clone(),
                                     },
                                 );
                                 if h.len() > 10 {
                                     h.pop();
                                 }
                                 history.set(h);
+                                save_history(
+                                    "unit_converter",
+                                    serde_json::json!({"value": input_str, "category": "length", "from_unit": from_label, "to_unit": to_label}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             }
                         }
                         is_converting.set(false);
@@ -674,6 +685,7 @@ pub fn unit_converter() -> Html {
                     let to = (*weight_to).clone();
                     let from_label = from.label().to_string();
                     let to_label = to.label().to_string();
+                    let history_refresh = history_refresh.clone();
                     spawn_local(async move {
                         let args =
                             serde_wasm_bindgen::to_value(&ConvertWeightArgs { value, from, to })
@@ -688,16 +700,22 @@ pub fn unit_converter() -> Html {
                                     0,
                                     HistoryEntry {
                                         category: cat,
-                                        from_value: input_str,
-                                        from_unit: from_label,
+                                        from_value: input_str.clone(),
+                                        from_unit: from_label.clone(),
                                         to_value: res.formatted,
-                                        to_unit: to_label,
+                                        to_unit: to_label.clone(),
                                     },
                                 );
                                 if h.len() > 10 {
                                     h.pop();
                                 }
                                 history.set(h);
+                                save_history(
+                                    "unit_converter",
+                                    serde_json::json!({"value": input_str, "category": "weight", "from_unit": from_label, "to_unit": to_label}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             }
                         }
                         is_converting.set(false);
@@ -708,6 +726,7 @@ pub fn unit_converter() -> Html {
                     let to = (*data_to).clone();
                     let from_label = from.label().to_string();
                     let to_label = to.label().to_string();
+                    let history_refresh = history_refresh.clone();
                     spawn_local(async move {
                         let args =
                             serde_wasm_bindgen::to_value(&ConvertDataSizeArgs { value, from, to })
@@ -722,16 +741,22 @@ pub fn unit_converter() -> Html {
                                     0,
                                     HistoryEntry {
                                         category: cat,
-                                        from_value: input_str,
-                                        from_unit: from_label,
+                                        from_value: input_str.clone(),
+                                        from_unit: from_label.clone(),
                                         to_value: res.formatted,
-                                        to_unit: to_label,
+                                        to_unit: to_label.clone(),
                                     },
                                 );
                                 if h.len() > 10 {
                                     h.pop();
                                 }
                                 history.set(h);
+                                save_history(
+                                    "unit_converter",
+                                    serde_json::json!({"value": input_str, "category": "data_size", "from_unit": from_label, "to_unit": to_label}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             }
                         }
                         is_converting.set(false);
@@ -742,6 +767,7 @@ pub fn unit_converter() -> Html {
                     let to = (*temp_to).clone();
                     let from_label = from.label().to_string();
                     let to_label = to.label().to_string();
+                    let history_refresh = history_refresh.clone();
                     spawn_local(async move {
                         let args = serde_wasm_bindgen::to_value(&ConvertTemperatureArgs {
                             value,
@@ -759,16 +785,22 @@ pub fn unit_converter() -> Html {
                                     0,
                                     HistoryEntry {
                                         category: cat,
-                                        from_value: input_str,
-                                        from_unit: from_label,
+                                        from_value: input_str.clone(),
+                                        from_unit: from_label.clone(),
                                         to_value: res.formatted,
-                                        to_unit: to_label,
+                                        to_unit: to_label.clone(),
                                     },
                                 );
                                 if h.len() > 10 {
                                     h.pop();
                                 }
                                 history.set(h);
+                                save_history(
+                                    "unit_converter",
+                                    serde_json::json!({"value": input_str, "category": "temperature", "from_unit": from_label, "to_unit": to_label}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             }
                         }
                         is_converting.set(false);
@@ -779,6 +811,7 @@ pub fn unit_converter() -> Html {
                     let to = (*time_to).clone();
                     let from_label = from.label().to_string();
                     let to_label = to.label().to_string();
+                    let history_refresh = history_refresh.clone();
                     spawn_local(async move {
                         let args =
                             serde_wasm_bindgen::to_value(&ConvertTimeArgs { value, from, to })
@@ -793,16 +826,22 @@ pub fn unit_converter() -> Html {
                                     0,
                                     HistoryEntry {
                                         category: cat,
-                                        from_value: input_str,
-                                        from_unit: from_label,
+                                        from_value: input_str.clone(),
+                                        from_unit: from_label.clone(),
                                         to_value: res.formatted,
-                                        to_unit: to_label,
+                                        to_unit: to_label.clone(),
                                     },
                                 );
                                 if h.len() > 10 {
                                     h.pop();
                                 }
                                 history.set(h);
+                                save_history(
+                                    "unit_converter",
+                                    serde_json::json!({"value": input_str, "category": "time", "from_unit": from_label, "to_unit": to_label}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             }
                         }
                         is_converting.set(false);
@@ -813,6 +852,7 @@ pub fn unit_converter() -> Html {
                     let to = (*area_to).clone();
                     let from_label = from.label().to_string();
                     let to_label = to.label().to_string();
+                    let history_refresh = history_refresh.clone();
                     spawn_local(async move {
                         let args =
                             serde_wasm_bindgen::to_value(&ConvertAreaArgs { value, from, to })
@@ -827,16 +867,22 @@ pub fn unit_converter() -> Html {
                                     0,
                                     HistoryEntry {
                                         category: cat,
-                                        from_value: input_str,
-                                        from_unit: from_label,
+                                        from_value: input_str.clone(),
+                                        from_unit: from_label.clone(),
                                         to_value: res.formatted,
-                                        to_unit: to_label,
+                                        to_unit: to_label.clone(),
                                     },
                                 );
                                 if h.len() > 10 {
                                     h.pop();
                                 }
                                 history.set(h);
+                                save_history(
+                                    "unit_converter",
+                                    serde_json::json!({"value": input_str, "category": "area", "from_unit": from_label, "to_unit": to_label}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             }
                         }
                         is_converting.set(false);
@@ -847,6 +893,7 @@ pub fn unit_converter() -> Html {
                     let to = (*volume_to).clone();
                     let from_label = from.label().to_string();
                     let to_label = to.label().to_string();
+                    let history_refresh = history_refresh.clone();
                     spawn_local(async move {
                         let args =
                             serde_wasm_bindgen::to_value(&ConvertVolumeArgs { value, from, to })
@@ -861,16 +908,22 @@ pub fn unit_converter() -> Html {
                                     0,
                                     HistoryEntry {
                                         category: cat,
-                                        from_value: input_str,
-                                        from_unit: from_label,
+                                        from_value: input_str.clone(),
+                                        from_unit: from_label.clone(),
                                         to_value: res.formatted,
-                                        to_unit: to_label,
+                                        to_unit: to_label.clone(),
                                     },
                                 );
                                 if h.len() > 10 {
                                     h.pop();
                                 }
                                 history.set(h);
+                                save_history(
+                                    "unit_converter",
+                                    serde_json::json!({"value": input_str, "category": "volume", "from_unit": from_label, "to_unit": to_label}),
+                                    None,
+                                );
+                                history_refresh.set(*history_refresh + 1);
                             }
                         }
                         is_converting.set(false);
@@ -909,6 +962,15 @@ pub fn unit_converter() -> Html {
         let history = history.clone();
         Callback::from(move |_| {
             history.set(Vec::new());
+        })
+    };
+
+    let on_history_restore = {
+        let input_value = input_value.clone();
+        Callback::from(move |inputs: serde_json::Value| {
+            if let Some(val) = inputs.get("value").and_then(|v| v.as_str()) {
+                input_value.set(val.to_string());
+            }
         })
     };
 
@@ -1356,7 +1418,14 @@ pub fn unit_converter() -> Html {
     html! {
         <div class="unit-converter">
             <div class="section unit-category-section">
-                <h3>{i18n.t("unit_converter.category_select")}</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 style="margin: 0;">{i18n.t("unit_converter.category_select")}</h3>
+                    <InputHistoryPanel
+                        tool_id="unit_converter"
+                        on_restore={on_history_restore}
+                        refresh_trigger={*history_refresh}
+                    />
+                </div>
                 <div class="category-grid">
                     { for UnitCategory::all().iter().map(|cat| {
                         let on_click = {
